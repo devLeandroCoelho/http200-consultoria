@@ -394,6 +394,28 @@
         </button>
     </main>
 
+    <!-- ===== MODAL: Detalhes do Serviço ===== -->
+    <div class="service-modal-overlay" id="serviceModal" role="dialog" aria-modal="true" aria-labelledby="serviceModalTitle">
+        <div class="service-modal">
+            <div class="service-modal-header">
+                <div class="service-modal-icon" id="serviceModalIcon" aria-hidden="true"></div>
+                <h2 id="serviceModalTitle"></h2>
+                <button class="service-modal-close" id="serviceModalClose" aria-label="Fechar modal">&times;</button>
+            </div>
+            <div class="service-modal-body">
+                <p id="serviceModalDesc"></p>
+            </div>
+            <div class="service-modal-footer">
+                <a href="#contato" class="btn btn-primary" id="serviceModalCta" aria-label="Fale conosco sobre este serviço">
+                    <span>Fale Conosco</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

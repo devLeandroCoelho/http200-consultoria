@@ -463,14 +463,17 @@
                 return;
             }
 
-            container.innerHTML = json.data.map(s => {
+            // Store services data for modal
+            window.__servicesData = json.data;
+
+            container.innerHTML = json.data.map((s, i) => {
                 const icon = SERVICE_ICONS[s.icon] || SERVICE_ICONS.default;
                 return `
-                    <article class="service-card" aria-label="Serviço de ${escapeHtml(s.titulo)}">
+                    <article class="service-card" data-service-index="${i}" role="button" tabindex="0" aria-label="Ver detalhes de ${escapeHtml(s.titulo)}">
                         <div class="service-icon" aria-hidden="true">${icon}</div>
                         <h3 class="service-title">${escapeHtml(s.titulo)}</h3>
                         <p class="service-desc">${escapeHtml(s.descricao)}</p>
-                        <span class="service-link" aria-hidden="true">
+                        <span class="service-link">
                             Saiba mais
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -479,6 +482,19 @@
                     </article>
                 `;
             }).join('');
+
+            // Add click handlers
+            container.querySelectorAll('.service-card').forEach(card => {
+                const idx = parseInt(card.dataset.serviceIndex);
+                const handler = () => openServiceModal(window.__servicesData[idx]);
+                card.addEventListener('click', handler);
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handler();
+                    }
+                });
+            });
 
             // Re-init hover feedback for new cards
             initHoverFeedback();
@@ -493,6 +509,37 @@
         div.textContent = str || '';
         return div.innerHTML;
     }
+
+    // --- Service Detail Modal ---
+    const serviceModal = document.getElementById('serviceModal');
+    const serviceModalTitle = document.getElementById('serviceModalTitle');
+    const serviceModalIcon = document.getElementById('serviceModalIcon');
+    const serviceModalDesc = document.getElementById('serviceModalDesc');
+    const serviceModalClose = document.getElementById('serviceModalClose');
+
+    function openServiceModal(service) {
+        serviceModalTitle.textContent = service.titulo;
+        serviceModalIcon.innerHTML = SERVICE_ICONS[service.icon] || SERVICE_ICONS.default;
+        serviceModalDesc.textContent = service.descricao;
+        serviceModal.classList.add('visible');
+        document.body.style.overflow = 'hidden';
+        serviceModalClose.focus();
+    }
+
+    function closeServiceModal() {
+        serviceModal.classList.remove('visible');
+        document.body.style.overflow = '';
+    }
+
+    serviceModalClose.addEventListener('click', closeServiceModal);
+    serviceModal.addEventListener('click', (e) => {
+        if (e.target === serviceModal) closeServiceModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && serviceModal.classList.contains('visible')) {
+            closeServiceModal();
+        }
+    });
 
     // --- Initialize All ---
     document.addEventListener('DOMContentLoaded', () => {

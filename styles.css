@@ -596,7 +596,7 @@ button {
     border-radius: 16px;
     padding: 2rem;
     transition: all var(--transition-base);
-    cursor: default;
+    cursor: pointer;
     position: relative;
     overflow: hidden;
 }
@@ -1333,5 +1333,139 @@ button {
     .hero {
         min-height: auto;
         padding: 2rem 0;
+    }
+}
+
+/* ===== Service Detail Modal ===== */
+.service-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    padding: 1rem;
+}
+
+.service-modal-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.service-modal {
+    background: #1e293b;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 85vh;
+    overflow-y: auto;
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.service-modal-overlay.visible .service-modal {
+    transform: translateY(0) scale(1);
+}
+
+.service-modal-header {
+    position: relative;
+    padding: 2rem 2rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.service-modal-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 1rem;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(6, 182, 212, 0.15));
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3b82f6;
+}
+
+.service-modal-icon svg {
+    width: 36px;
+    height: 36px;
+}
+
+.service-modal-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin: 0;
+}
+
+.service-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 1.75rem;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.service-modal-close:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f1f5f9;
+}
+
+.service-modal-body {
+    padding: 1.5rem 2rem;
+}
+
+.service-modal-body p {
+    color: #94a3b8;
+    font-size: 1rem;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.service-modal-footer {
+    padding: 1rem 2rem 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.service-modal-footer .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+    .service-modal {
+        max-height: 90vh;
+        margin: 0.5rem;
+    }
+
+    .service-modal-header {
+        padding: 1.5rem 1.5rem 1rem;
+    }
+
+    .service-modal-body {
+        padding: 1rem 1.5rem;
+    }
+
+    .service-modal-footer {
+        padding: 1rem 1.5rem 1.5rem;
     }
 }
