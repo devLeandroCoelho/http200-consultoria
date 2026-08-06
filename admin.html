@@ -835,8 +835,8 @@
     async function loadServicos() {
       const container = document.getElementById('servicosList');
       container.innerHTML = '<div class="loading-overlay"><span class="spinner"></span>&nbsp; Carregando...</div>';
-      const data = await apiFetch('/servicos');
-      servicos = Array.isArray(data) ? data : [];
+      const res = await apiFetch('/servicos');
+      servicos = (res && res.success && Array.isArray(res.data)) ? res.data : [];
       renderServicos();
     }
 
@@ -957,8 +957,8 @@
     let conteudo = {};
 
     async function loadConteudo() {
-      const data = await apiFetch('/conteudo');
-      conteudo = data || {};
+      const res = await apiFetch('/conteudo');
+      conteudo = (res && res.success && res.data) ? res.data : {};
       fillConteudoForms();
     }
 
@@ -1056,8 +1056,8 @@
     let config = {};
 
     async function loadConfig() {
-      const data = await apiFetch('/config');
-      config = data || {};
+      const res = await apiFetch('/config');
+      config = (res && res.success && res.data) ? res.data : {};
       fillConfigForm();
     }
 
