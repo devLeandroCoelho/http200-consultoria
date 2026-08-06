@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — HTTP200.TI</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --primary: #3b82f6;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --sidebar-w: 260px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ========== SIDEBAR ========== */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      transition: transform 0.3s;
+    }
+
+    .sidebar-logo {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-logo h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .sidebar-logo small {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 1rem 0;
+      overflow-y: auto;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1.5rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: background 0.2s, color 0.2s;
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar-nav a:hover,
+    .sidebar-nav a.active {
+      background: rgba(59, 130, 246, 0.08);
+      color: var(--text);
+      border-left-color: var(--primary);
+    }
+
+    .sidebar-nav a svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .sidebar-footer a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 0.5rem 0;
+      transition: color 0.2s;
+    }
+
+    .sidebar-footer a:hover {
+      color: var(--danger);
+    }
+
+    /* ========== MAIN ========== */
+    .main-content {
+      margin-left: var(--sidebar-w);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .page-header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .page-header-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    /* ========== BUTTONS ========== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1.25rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #2563eb);
+      color: white;
+    }
+
+    .btn-primary:hover { box-shadow: 0 8px 16px -4px rgba(59,130,246,0.4); }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
+
+    .btn-sm {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    /* ========== CARDS ========== */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      border-color: rgba(59,130,246,0.3);
+      box-shadow: 0 0 20px -5px rgba(59,130,246,0.1);
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* ========== FORMS ========== */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.625rem 0.875rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* ========== SECTIONS ========== */
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ========== MODAL ========== */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+
+    .modal-overlay.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      width: 90%;
+      max-width: 500px;
+      max-height: 85vh;
+      overflow-y: auto;
+      transform: translateY(10px);
+      transition: transform 0.2s;
+    }
+
+    .modal-overlay.visible .modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-header h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.25rem;
+      line-height: 1;
+    }
+
+    .modal-close:hover { color: var(--text); }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ========== TOAST ========== */
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .toast {
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: white;
+      animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+    }
+
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+    .toast.info { background: var(--primary); }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes toastOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    /* ========== LOADING ========== */
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    .loading-overlay {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      color: var(--text-muted);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ========== EMPTY STATE ========== */
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state p {
+      margin-bottom: 1rem;
+    }
+
+    /* ========== MOBILE TOGGLE ========== */
+    .mobile-toggle {
+      display: none;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 150;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .mobile-toggle svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 90;
+    }
+
+    /* ========== COLOR INPUT ========== */
+    .color-input-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .color-input-group input[type="color"] {
+      width: 40px;
+      height: 40px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      background: none;
+      padding: 2px;
+    }
+
+    .color-input-group input[type="text"] {
+      flex: 1;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-backdrop.visible {
+        display: block;
+      }
+
+      .mobile-toggle {
+        display: flex;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 1rem;
+        padding-top: 4rem;
+      }
+
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal {
+        width: 95%;
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Mobile Toggle -->
+  <button class="mobile-toggle" id="mobileToggle" aria-label="Abrir menu de navegação">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+  </button>
+
+  <!-- Backdrop -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Menu principal">
+    <div class="sidebar-logo">
+      <h2>HTTP200.TI</h2>
+      <small>Painel Admin</small>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#servicos" class="active" data-section="servicos" aria-label="Gerenciar serviços">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        Serviços
+      </a>
+      <a href="#conteudo" data-section="conteudo" aria-label="Gerenciar conteúdo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Conteúdo
+      </a>
+      <a href="#config" data-section="config" aria-label="Configurações">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Configurações
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="/" target="_blank" aria-label="Ver site ao vivo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+        Ver site
+      </a>
+      <a href="#" id="logoutBtn" aria-label="Sair do painel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Sair
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- ===== SERVIÇOS ===== -->
+    <section class="section active" id="section-servicos">
+      <div class="page-header">
+        <h1>Serviços</h1>
+        <div class="page-header-actions">
+          <button class="btn btn-primary" id="addServicoBtn" aria-label="Adicionar novo serviço">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M12 5v14M5 12h14"/></svg>
+            Adicionar serviço
+          </button>
+        </div>
+      </div>
+      <div id="servicosList" class="cards-grid">
+        <div class="loading-overlay"><span class="spinner"></span>&nbsp; Carregando...</div>
+      </div>
+    </section>
+
+    <!-- ===== CONTEÚDO ===== -->
+    <section class="section" id="section-conteudo">
+      <div class="page-header">
+        <h1>Conteúdo da Landing</h1>
+      </div>
+
+      <!-- Hero -->
+      <div class="card" style="margin-bottom: 1.25rem;">
+        <h3 class="section-title">Hero</h3>
+        <form id="heroForm">
+          <div class="form-group">
+            <label for="heroTitulo">Título</label>
+            <input type="text" id="heroTitulo" placeholder="Título principal" />
+          </div>
+          <div class="form-group">
+            <label for="heroSubtitulo">Subtítulo</label>
+            <textarea id="heroSubtitulo" placeholder="Subtítulo" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="heroCta">Texto do CTA</label>
+            <input type="text" id="heroCta" placeholder="Ex: Fale conosco" />
+          </div>
+          <button type="submit" class="btn btn-primary" aria-label="Salvar Hero">Salvar Hero</button>
+        </form>
+      </div>
+
+      <!-- Sobre -->
+      <div class="card" style="margin-bottom: 1.25rem;">
+        <h3 class="section-title">Sobre</h3>
+        <form id="sobreForm">
+          <div class="form-group">
+            <label for="sobreTitulo">Título da Seção</label>
+            <input type="text" id="sobreTitulo" placeholder="Sobre nós" />
+          </div>
+          <div class="form-group">
+            <label for="sobreTexto">Texto</label>
+            <textarea id="sobreTexto" placeholder="Texto sobre a empresa" rows="4"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" aria-label="Salvar Sobre">Salvar Sobre</button>
+        </form>
+      </div>
+
+      <!-- Diferenciais -->
+      <div class="card" style="margin-bottom: 1.25rem;">
+        <h3 class="section-title">Diferenciais</h3>
+        <form id="diferenciaisForm">
+          <div id="diferenciaisFields"></div>
+          <button type="submit" class="btn btn-primary" aria-label="Salvar Diferenciais">Salvar Diferenciais</button>
+        </form>
+      </div>
+
+      <!-- CTA Final -->
+      <div class="card" style="margin-bottom: 1.25rem;">
+        <h3 class="section-title">CTA Final</h3>
+        <form id="ctaForm">
+          <div class="form-group">
+            <label for="ctaTitulo">Título</label>
+            <input type="text" id="ctaTitulo" placeholder="Título do CTA final" />
+          </div>
+          <div class="form-group">
+            <label for="ctaSubtitulo">Subtítulo</label>
+            <textarea id="ctaSubtitulo" placeholder="Subtítulo" rows="2"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" aria-label="Salvar CTA Final">Salvar CTA</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===== CONFIGURAÇÕES ===== -->
+    <section class="section" id="section-config">
+      <div class="page-header">
+        <h1>Configurações</h1>
+      </div>
+      <div class="card">
+        <form id="configForm">
+          <h3 class="section-title">Contato</h3>
+          <div class="form-group">
+            <label for="configEmail">Email de contato</label>
+            <input type="email" id="configEmail" placeholder="contato@exemplo.com" />
+          </div>
+
+          <h3 class="section-title" style="margin-top:1.5rem;">Redes Sociais</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="configLinkedin">LinkedIn URL</label>
+              <input type="url" id="configLinkedin" placeholder="https://linkedin.com/..." />
+            </div>
+            <div class="form-group">
+              <label for="configGithub">GitHub URL</label>
+              <input type="url" id="configGithub" placeholder="https://github.com/..." />
+            </div>
+          </div>
+
+          <h3 class="section-title" style="margin-top:1.5rem;">Cores do Tema</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="configCorPrimaria">Cor Primária</label>
+              <div class="color-input-group">
+                <input type="color" id="configCorPrimariaPicker" value="#3b82f6" />
+                <input type="text" id="configCorPrimaria" placeholder="#3b82f6" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="configCorAccent">Cor Accent</label>
+              <div class="color-input-group">
+                <input type="color" id="configCorAccentPicker" value="#06b6d4" />
+                <input type="text" id="configCorAccent" placeholder="#06b6d4" />
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" aria-label="Salvar configurações" style="margin-top:1rem;">Salvar Configurações</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== MODAL: Serviço ===== -->
+  <div class="modal-overlay" id="servicoModal" role="dialog" aria-modal="true" aria-labelledby="servicoModalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="servicoModalTitle">Novo Serviço</h3>
+        <button class="modal-close" id="servicoModalClose" aria-label="Fechar modal">&times;</button>
+      </div>
+      <form id="servicoForm">
+        <input type="hidden" id="servicoId" />
+        <div class="form-group">
+          <label for="servicoTitulo">Título</label>
+          <input type="text" id="servicoTitulo" placeholder="Ex: Consultoria em TI" required />
+        </div>
+        <div class="form-group">
+          <label for="servicoDescricao">Descrição</label>
+          <textarea id="servicoDescricao" placeholder="Descreva o serviço..." rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="servicoIcone">Ícone (emoji ou texto curto)</label>
+          <input type="text" id="servicoIcone" placeholder="Ex: 💻 ou 🔒" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="servicoCancelBtn">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="servicoSaveBtn">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: Confirmação ===== -->
+  <div class="modal-overlay" id="confirmModal" role="alertdialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+    <div class="modal" style="max-width: 380px;">
+      <div class="modal-header">
+        <h3 id="confirmModalTitle">Confirmar exclusão</h3>
+        <button class="modal-close" id="confirmModalClose" aria-label="Fechar">&times;</button>
+      </div>
+      <p id="confirmModalMsg" style="color: var(--text-muted); margin-bottom: 1.5rem;"></p>
+      <div class="modal-actions" style="border: none; padding: 0; margin: 0;">
+        <button class="btn btn-ghost" id="confirmCancelBtn">Cancelar</button>
+        <button class="btn btn-danger" id="confirmOkBtn">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script>
+    /* ===========================
+       UTILS
+    =========================== */
+    const API = '/api';
+    let token = localStorage.getItem('admin_token');
+
+    function getHeaders(auth = true) {
+      const h = { 'Content-Type': 'application/json' };
+      if (auth && token) h['Authorization'] = 'Bearer ' + token;
+      return h;
+    }
+
+    function toast(msg, type = 'info') {
+      const el = document.createElement('div');
+      el.className = 'toast ' + type;
+      el.textContent = msg;
+      document.getElementById('toastContainer').appendChild(el);
+      setTimeout(() => el.remove(), 3200);
+    }
+
+    async function apiFetch(path, opts = {}) {
+      const res = await fetch(API + path, {
+        ...opts,
+        headers: getHeaders(opts.auth !== false)
+      });
+      if (res.status === 401) {
+        localStorage.removeItem('admin_token');
+        window.location.href = '/login.html';
+        return null;
+      }
+      return res.json();
+    }
+
+    /* Auth check */
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+
+    /* ===========================
+       NAVIGATION
+    =========================== */
+    const sidebarLinks = document.querySelectorAll('.sidebar-nav a[data-section]');
+    const sections = document.querySelectorAll('.section');
+
+    function showSection(name) {
+      sidebarLinks.forEach(l => l.classList.remove('active'));
+      sections.forEach(s => s.classList.remove('active'));
+      const link = document.querySelector(`.sidebar-nav a[data-section="${name}"]`);
+      const sec = document.getElementById('section-' + name);
+      if (link) link.classList.add('active');
+      if (sec) sec.classList.add('active');
+      // Fechar sidebar no mobile
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarBackdrop').classList.remove('visible');
+    }
+
+    sidebarLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const section = link.dataset.section;
+        showSection(section);
+        if (section === 'servicos') loadServicos();
+        if (section === 'conteudo') loadConteudo();
+        if (section === 'config') loadConfig();
+      });
+    });
+
+    /* Mobile sidebar */
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebarBackdrop').classList.toggle('visible');
+    });
+    document.getElementById('sidebarBackdrop').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarBackdrop').classList.remove('visible');
+    });
+
+    /* Logout */
+    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.removeItem('admin_token');
+      window.location.href = '/login.html';
+    });
+
+    /* ===========================
+       SERVIÇOS
+    =========================== */
+    let servicos = [];
+
+    async function loadServicos() {
+      const container = document.getElementById('servicosList');
+      container.innerHTML = '<div class="loading-overlay"><span class="spinner"></span>&nbsp; Carregando...</div>';
+      const data = await apiFetch('/servicos');
+      servicos = Array.isArray(data) ? data : [];
+      renderServicos();
+    }
+
+    function renderServicos() {
+      const container = document.getElementById('servicosList');
+      if (servicos.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>Nenhum serviço cadastrado.</p><p>Clique em "Adicionar serviço" para começar.</p></div>';
+        return;
+      }
+      container.innerHTML = servicos.map(s => `
+        <div class="card" data-id="${s.id}">
+          <div style="font-size:1.75rem; margin-bottom:0.75rem;">${s.icone || '💼'}</div>
+          <h3 style="font-size:1rem; margin-bottom:0.5rem;">${escapeHtml(s.titulo)}</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">${escapeHtml(s.descricao)}</p>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-ghost btn-sm edit-servico" data-id="${s.id}" aria-label="Editar serviço ${escapeHtml(s.titulo)}">Editar</button>
+            <button class="btn btn-danger btn-sm delete-servico" data-id="${s.id}" aria-label="Excluir serviço ${escapeHtml(s.titulo)}">Excluir</button>
+          </div>
+        </div>
+      `).join('');
+
+      container.querySelectorAll('.edit-servico').forEach(btn => {
+        btn.addEventListener('click', () => openServicoModal(btn.dataset.id));
+      });
+      container.querySelectorAll('.delete-servico').forEach(btn => {
+        btn.addEventListener('click', () => confirmDeleteServico(btn.dataset.id));
+      });
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str || '';
+      return div.innerHTML;
+    }
+
+    /* Modal Serviço */
+    const servicoModal = document.getElementById('servicoModal');
+
+    function openServicoModal(id) {
+      const servico = id ? servicos.find(s => s.id === id) : null;
+      document.getElementById('servicoModalTitle').textContent = servico ? 'Editar Serviço' : 'Novo Serviço';
+      document.getElementById('servicoId').value = servico ? servico.id : '';
+      document.getElementById('servicoTitulo').value = servico ? servico.titulo : '';
+      document.getElementById('servicoDescricao').value = servico ? servico.descricao : '';
+      document.getElementById('servicoIcone').value = servico ? (servico.icone || '') : '';
+      servicoModal.classList.add('visible');
+      document.getElementById('servicoTitulo').focus();
+    }
+
+    function closeServicoModal() {
+      servicoModal.classList.remove('visible');
+    }
+
+    document.getElementById('addServicoBtn').addEventListener('click', () => openServicoModal(null));
+    document.getElementById('servicoModalClose').addEventListener('click', closeServicoModal);
+    document.getElementById('servicoCancelBtn').addEventListener('click', closeServicoModal);
+    servicoModal.addEventListener('click', (e) => {
+      if (e.target === servicoModal) closeServicoModal();
+    });
+
+    document.getElementById('servicoForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('servicoId').value;
+      const titulo = document.getElementById('servicoTitulo').value.trim();
+      const descricao = document.getElementById('servicoDescricao').value.trim();
+      const icone = document.getElementById('servicoIcone').value.trim();
+
+      if (!titulo || !descricao) {
+        toast('Preencha título e descrição.', 'error');
+        return;
+      }
+
+      const body = { titulo, descricao, icone };
+
+      if (id) {
+        await apiFetch('/servicos/' + id, { method: 'PUT', body: JSON.stringify(body) });
+        toast('Serviço atualizado!', 'success');
+      } else {
+        await apiFetch('/servicos', { method: 'POST', body: JSON.stringify(body) });
+        toast('Serviço criado!', 'success');
+      }
+      closeServicoModal();
+      loadServicos();
+    });
+
+    /* Confirm delete */
+    const confirmModal = document.getElementById('confirmModal');
+    let deleteId = null;
+
+    function confirmDeleteServico(id) {
+      const s = servicos.find(x => x.id === id);
+      deleteId = id;
+      document.getElementById('confirmModalMsg').textContent = `Excluir o serviço "${s ? s.titulo : ''}"? Esta ação não pode ser desfeita.`;
+      confirmModal.classList.add('visible');
+      document.getElementById('confirmCancelBtn').focus();
+    }
+
+    function closeConfirm() {
+      confirmModal.classList.remove('visible');
+      deleteId = null;
+    }
+
+    document.getElementById('confirmModalClose').addEventListener('click', closeConfirm);
+    document.getElementById('confirmCancelBtn').addEventListener('click', closeConfirm);
+    confirmModal.addEventListener('click', (e) => { if (e.target === confirmModal) closeConfirm(); });
+
+    document.getElementById('confirmOkBtn').addEventListener('click', async () => {
+      if (!deleteId) return;
+      await apiFetch('/servicos/' + deleteId, { method: 'DELETE' });
+      toast('Serviço excluído.', 'success');
+      closeConfirm();
+      loadServicos();
+    });
+
+    /* ===========================
+       CONTEÚDO
+    =========================== */
+    let conteudo = {};
+
+    async function loadConteudo() {
+      const data = await apiFetch('/conteudo');
+      conteudo = data || {};
+      fillConteudoForms();
+    }
+
+    function fillConteudoForms() {
+      /* Hero */
+      document.getElementById('heroTitulo').value = conteudo.hero?.titulo || '';
+      document.getElementById('heroSubtitulo').value = conteudo.hero?.subtitulo || '';
+      document.getElementById('heroCta').value = conteudo.hero?.cta || '';
+
+      /* Sobre */
+      document.getElementById('sobreTitulo').value = conteudo.sobre?.titulo || '';
+      document.getElementById('sobreTexto').value = conteudo.sobre?.texto || '';
+
+      /* Diferenciais */
+      const difContainer = document.getElementById('diferenciaisFields');
+      const diffs = conteudo.diferenciais || [
+        { titulo: '', descricao: '' },
+        { titulo: '', descricao: '' },
+        { titulo: '', descricao: '' },
+        { titulo: '', descricao: '' }
+      ];
+      difContainer.innerHTML = diffs.map((d, i) => `
+        <div class="form-row" style="margin-bottom: 1rem;">
+          <div class="form-group">
+            <label for="difTitulo${i}">Diferencial ${i + 1} — Título</label>
+            <input type="text" id="difTitulo${i}" value="${escapeHtml(d.titulo)}" placeholder="Ex: Experiência" />
+          </div>
+          <div class="form-group">
+            <label for="difDesc${i}">Diferencial ${i + 1} — Descrição</label>
+            <input type="text" id="difDesc${i}" value="${escapeHtml(d.descricao)}" placeholder="Descreva..." />
+          </div>
+        </div>
+      `).join('');
+
+      /* CTA */
+      document.getElementById('ctaTitulo').value = conteudo.cta?.titulo || '';
+      document.getElementById('ctaSubtitulo').value = conteudo.cta?.subtitulo || '';
+    }
+
+    /* Hero */
+    document.getElementById('heroForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      conteudo.hero = {
+        titulo: document.getElementById('heroTitulo').value.trim(),
+        subtitulo: document.getElementById('heroSubtitulo').value.trim(),
+        cta: document.getElementById('heroCta').value.trim()
+      };
+      await saveConteudo();
+      toast('Hero salvo!', 'success');
+    });
+
+    /* Sobre */
+    document.getElementById('sobreForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      conteudo.sobre = {
+        titulo: document.getElementById('sobreTitulo').value.trim(),
+        texto: document.getElementById('sobreTexto').value.trim()
+      };
+      await saveConteudo();
+      toast('Sobre salvo!', 'success');
+    });
+
+    /* Diferenciais */
+    document.getElementById('diferenciaisForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const diffs = [];
+      for (let i = 0; i < 4; i++) {
+        const titulo = document.getElementById('difTitulo' + i)?.value.trim() || '';
+        const descricao = document.getElementById('difDesc' + i)?.value.trim() || '';
+        diffs.push({ titulo, descricao });
+      }
+      conteudo.diferenciais = diffs;
+      await saveConteudo();
+      toast('Diferenciais salvos!', 'success');
+    });
+
+    /* CTA */
+    document.getElementById('ctaForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      conteudo.cta = {
+        titulo: document.getElementById('ctaTitulo').value.trim(),
+        subtitulo: document.getElementById('ctaSubtitulo').value.trim()
+      };
+      await saveConteudo();
+      toast('CTA salvo!', 'success');
+    });
+
+    async function saveConteudo() {
+      await apiFetch('/conteudo', { method: 'PUT', body: JSON.stringify(conteudo) });
+    }
+
+    /* ===========================
+       CONFIGURAÇÕES
+    =========================== */
+    let config = {};
+
+    async function loadConfig() {
+      const data = await apiFetch('/config');
+      config = data || {};
+      fillConfigForm();
+    }
+
+    function fillConfigForm() {
+      document.getElementById('configEmail').value = config.email || '';
+      document.getElementById('configLinkedin').value = config.linkedin || '';
+      document.getElementById('configGithub').value = config.github || '';
+
+      const corPrimaria = config.corPrimaria || '#3b82f6';
+      const corAccent = config.corAccent || '#06b6d4';
+
+      document.getElementById('configCorPrimaria').value = corPrimaria;
+      document.getElementById('configCorPrimariaPicker').value = corPrimaria;
+      document.getElementById('configCorAccent').value = corAccent;
+      document.getElementById('configCorAccentPicker').value = corAccent;
+    }
+
+    /* Sync color pickers */
+    document.getElementById('configCorPrimariaPicker').addEventListener('input', (e) => {
+      document.getElementById('configCorPrimaria').value = e.target.value;
+    });
+    document.getElementById('configCorPrimaria').addEventListener('input', (e) => {
+      if (/^#[0-9a-fA-F]{6}$/.test(e.target.value)) {
+        document.getElementById('configCorPrimariaPicker').value = e.target.value;
+      }
+    });
+    document.getElementById('configCorAccentPicker').addEventListener('input', (e) => {
+      document.getElementById('configCorAccent').value = e.target.value;
+    });
+    document.getElementById('configCorAccent').addEventListener('input', (e) => {
+      if (/^#[0-9a-fA-F]{6}$/.test(e.target.value)) {
+        document.getElementById('configCorAccentPicker').value = e.target.value;
+      }
+    });
+
+    document.getElementById('configForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      config = {
+        email: document.getElementById('configEmail').value.trim(),
+        linkedin: document.getElementById('configLinkedin').value.trim(),
+        github: document.getElementById('configGithub').value.trim(),
+        corPrimaria: document.getElementById('configCorPrimaria').value.trim(),
+        corAccent: document.getElementById('configCorAccent').value.trim()
+      };
+      await apiFetch('/config', { method: 'PUT', body: JSON.stringify(config) });
+      toast('Configurações salvas!', 'success');
+    });
+
+    /* ===========================
+       KEYBOARD: Escape fecha modais
+    =========================== */
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeServicoModal();
+        closeConfirm();
+      }
+    });
+
+    /* ===========================
+       INIT
+    =========================== */
+    loadServicos();
+  </script>
+</body>
+</html>
