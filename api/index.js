@@ -62,5 +62,5 @@ export default async function handler(req) {
 }
 
 export const config = {
-  runtime: 'edge',
+  runtime: 'nodejs22.x',
 };
