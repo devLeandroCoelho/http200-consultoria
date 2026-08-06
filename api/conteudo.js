@@ -1,36 +1,40 @@
-import { supabase } from './_lib/supabase.js';
-import { verifyToken } from './auth/verify.js';
+/**
+ * HTTP200.TI Consultoria — Conteúdo
+ * 
+ * Gerencia o conteúdo dinâmico da landing page.
+ * 
+ * Rotas:
+ *   GET /api/conteudo  — Retorna todo conteúdo (público)
+ *   PUT /api/conteudo  — Atualiza conteúdo (autenticado)
+ * 
+ * Chaves disponíveis:
+ *   hero, sobre, diferenciais, cta
+ * 
+ * Autor: Leandro Coelho — http200.ti@gmail.com
+ * Versão: 1.0.0
+ * Data: 2026-08-06
+ */
 
+import { supabase } from './_lib/supabase.js';
+import { verifyToken } from './auth.js';
+
+/** Headers CORS */
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-const rateLimitMap = new Map();
-const RATE_LIMIT = 100;
-const RATE_WINDOW = 60 * 1000;
-
-function checkRateLimit(ip) {
-  const now = Date.now();
-  const record = rateLimitMap.get(ip);
-  if (!record || now - record.start > RATE_WINDOW) {
-    rateLimitMap.set(ip, { start: now, count: 1 });
-    return true;
-  }
-  if (record.count >= RATE_LIMIT) return false;
-  record.count++;
-  return true;
-}
-
-function getClientIp(req) {
-  return req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-}
-
+/** Chaves permitidas para conteúdo (whitelist de segurança) */
 const CONTENT_KEYS = ['hero', 'sobre', 'diferenciais', 'cta'];
 
+/**
+ * Remove tags HTML e sanitiza strings
+ * @param {*} obj - Objeto a ser sanitizado
+ * @returns {*} Objeto sanitizado
+ */
 function sanitizeObject(obj) {
-  if (typeof obj === 'string') return obj.trim();
+  if (typeof obj === 'string') return obj.trim().replace(/<[^>]*>/g, '');
   if (Array.isArray(obj)) return obj.map(sanitizeObject);
   if (obj && typeof obj === 'object') {
     const sanitized = {};
@@ -42,7 +46,10 @@ function sanitizeObject(obj) {
   return obj;
 }
 
-// GET - retornar todo conteúdo (público)
+/**
+ * GET — Retorna todo conteúdo (público)
+ * Agrupa por chave em um objeto único
+ */
 async function getConteudo() {
   const { data, error } = await supabase
     .from('conteudo')
@@ -56,6 +63,7 @@ async function getConteudo() {
     );
   }
 
+  // Converte array de {chave, dados} para objeto {hero: {...}, sobre: {...}}
   const conteudo = {};
   if (data) {
     for (const item of data) {
@@ -69,7 +77,11 @@ async function getConteudo() {
   );
 }
 
-// PUT - atualizar conteúdo (autenticado)
+/**
+ * PUT — Atualiza conteúdo (autenticado)
+ * Aceita múltiplas chaves no mesmo request
+ * @body {Object} body - Objeto com chaves a atualizar
+ */
 async function updateConteudo(req) {
   const user = verifyToken(req);
   if (!user) {
@@ -84,15 +96,17 @@ async function updateConteudo(req) {
     const updates = {};
 
     for (const [key, value] of Object.entries(body)) {
+      // Validação: só permite chaves da whitelist
       if (!CONTENT_KEYS.includes(key)) {
         return new Response(
           JSON.stringify({ success: false, error: `Chave '${key}' não é permitida` }),
           { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
         );
       }
+
       const sanitized = sanitizeObject(value);
 
-      // Upsert (insert ou update)
+      // Upsert: insere ou atualiza
       const { error } = await supabase
         .from('conteudo')
         .upsert(
@@ -124,17 +138,12 @@ async function updateConteudo(req) {
   }
 }
 
-export default async function handler(req) {
+/**
+ * Handler principal — roteia por método HTTP
+ */
+export async function handler(req) {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders });
-  }
-
-  const ip = getClientIp(req);
-  if (!checkRateLimit(ip)) {
-    return new Response(
-      JSON.stringify({ success: false, error: 'Rate limit excedido. Tente novamente em 1 minuto.' }),
-      { status: 429, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-    );
   }
 
   switch (req.method) {
@@ -148,4 +157,5 @@ export default async function handler(req) {
   }
 }
 
-export const config = { runtime: 'nodejs' };
+export default handler;
+export const config = { runtime: 'nodejs22.x' };

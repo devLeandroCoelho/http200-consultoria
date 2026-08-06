@@ -1,101 +1,178 @@
-import { kv } from '@vercel/kv';
-import { verifyToken } from './auth/verify.js';
+/**
+ * HTTP200.TI Consultoria — Upload de Imagens
+ * 
+ * Gerencia upload de imagens para o site.
+ * 
+ * Rota:
+ *   POST /api/upload — Upload de imagem (autenticado)
+ * 
+ * Restrições:
+ *   - Formatos aceitos: jpg, png, svg
+ *   - Tamanho máximo: 2MB
+ *   - Armazenamento: base64 no banco (temporário)
+ * 
+ * Autor: Leandro Coelho — http200.ti@gmail.com
+ * Versão: 1.0.0
+ * Data: 2026-08-06
+ */
 
+import { supabase } from './_lib/supabase.js';
+import { verifyToken } from './auth.js';
+
+/** Headers CORS */
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-const rateLimitMap = new Map();
-const RATE_LIMIT = 20;
-const RATE_WINDOW = 60 * 1000;
+/** Configurações de upload */
+const UPLOAD_CONFIG = {
+  maxSizeBytes: 2 * 1024 * 1024, // 2MB
+  allowedTypes: ['image/jpeg', 'image/png', 'image/svg+xml'],
+  allowedExtensions: ['.jpg', '.jpeg', '.png', '.svg'],
+};
 
-function checkRateLimit(ip) {
-  const now = Date.now();
-  const record = rateLimitMap.get(ip);
-  if (!record || now - record.start > RATE_WINDOW) {
-    rateLimitMap.set(ip, { start: now, count: 1 });
-    return true;
-  }
-  if (record.count >= RATE_LIMIT) return false;
-  record.count++;
-  return true;
+/**
+ * Valida se o tipo do arquivo é permitido
+ * @param {string} filename - Nome do arquivo
+ * @returns {boolean} True se válido
+ */
+function isValidFileType(filename) {
+  const ext = '.' + filename.split('.').pop().toLowerCase();
+  return UPLOAD_CONFIG.allowedExtensions.includes(ext);
 }
 
-function getClientIp(req) {
-  return req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-}
-
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/svg+xml'];
-const MAX_SIZE = 2 * 1024 * 1024;
-
-export default async function handler(req) {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: corsHeaders });
-  }
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ success: false, error: 'Método não permitido' }), { status: 405, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
-  }
-
-  const ip = getClientIp(req);
-  if (!checkRateLimit(ip)) {
-    return new Response(JSON.stringify({ success: false, error: 'Rate limit excedido' }), { status: 429, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
-  }
-
+/**
+ * POST — Upload de imagem (autenticado)
+ * Recebe imagem em base64 e salva no banco
+ * @body {string} filename - Nome do arquivo
+ * @body {string} data - Dados em base64 (data:image/...;base64,...)
+ */
+async function uploadImage(req) {
   const user = verifyToken(req);
   if (!user) {
-    return new Response(JSON.stringify({ success: false, error: 'Não autorizado' }), { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
+    return new Response(
+      JSON.stringify({ success: false, error: 'Não autorizado' }),
+      { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+    );
   }
 
   try {
-    const contentType = req.headers.get('content-type');
+    const body = await req.json();
+    const { filename, data } = body;
 
-    // Upload via multipart/form-data
-    if (contentType?.includes('multipart/form-data')) {
-      const formData = await req.formData();
-      const file = formData.get('file');
-      if (!file) {
-        return new Response(JSON.stringify({ success: false, error: 'Nenhum arquivo enviado' }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
-      }
-      if (!ALLOWED_TYPES.includes(file.type)) {
-        return new Response(JSON.stringify({ success: false, error: `Tipo não permitido. Aceitos: ${ALLOWED_TYPES.join(', ')}` }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
-      }
-      if (file.size > MAX_SIZE) {
-        return new Response(JSON.stringify({ success: false, error: 'Arquivo muito grande. Máximo: 2MB' }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
-      }
-      const arrayBuffer = await file.arrayBuffer();
-      const base64 = Buffer.from(arrayBuffer).toString('base64');
-      const dataUrl = `data:${file.type};base64,${base64}`;
-      const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
-      await kv.set(`upload:${id}`, { id, url: dataUrl, type: file.type, size: file.size, name: file.name, uploadedBy: user.user, uploadedAt: new Date().toISOString() });
-      return new Response(JSON.stringify({ success: true, data: { url: dataUrl, id } }), { status: 201, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
+    // Validação de campos
+    if (!filename || !data) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Nome e dados do arquivo são obrigatórios' }),
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
     }
 
-    // Upload via JSON com base64
-    if (contentType?.includes('application/json')) {
-      const body = await req.json();
-      const { data, type, name } = body;
-      if (!data || !type) {
-        return new Response(JSON.stringify({ success: false, error: 'Dados e tipo são obrigatórios' }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
-      }
-      if (!ALLOWED_TYPES.includes(type)) {
-        return new Response(JSON.stringify({ success: false, error: `Tipo não permitido. Aceitos: ${ALLOWED_TYPES.join(', ')}` }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
-      }
-      const sizeInBytes = Math.ceil((data.length * 3) / 4);
-      if (sizeInBytes > MAX_SIZE) {
-        return new Response(JSON.stringify({ success: false, error: 'Arquivo muito grande. Máximo: 2MB' }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
-      }
-      const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
-      await kv.set(`upload:${id}`, { id, url: data, type, size: sizeInBytes, name: name || 'unnamed', uploadedBy: user.user, uploadedAt: new Date().toISOString() });
-      return new Response(JSON.stringify({ success: true, data: { url: data, id } }), { status: 201, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
+    // Validação de tipo
+    if (!isValidFileType(filename)) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: `Tipo não permitido. Aceitos: ${UPLOAD_CONFIG.allowedExtensions.join(', ')}` 
+        }),
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
     }
 
-    return new Response(JSON.stringify({ success: false, error: 'Content-Type não suportado' }), { status: 415, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
+    // Validação de tamanho (estimativa do base64)
+    const base64Data = data.split(',')[1] || data;
+    const sizeInBytes = Math.ceil(base64Data.length * 3 / 4);
+    if (sizeInBytes > UPLOAD_CONFIG.maxSizeBytes) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: `Arquivo muito grande. Máximo: ${UPLOAD_CONFIG.maxSizeBytes / 1024 / 1024}MB` 
+        }),
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
+
+    // Gera ID único para o upload
+    const uploadId = Date.now().toString(36) + Math.random().toString(36).slice(2);
+
+    // Salva no banco
+    const { error } = await supabase
+      .from('uploads')
+      .upsert(
+        { 
+          id: uploadId, 
+          filename, 
+          data, 
+          created_at: new Date().toISOString() 
+        },
+        { onConflict: 'id' }
+      );
+
+    if (error) {
+      // Se a tabela não existir, cria e tenta novamente
+      console.warn('Tabela uploads não existe, tentando criar...');
+      await supabase.rpc('exec_sql', { 
+        sql: `CREATE TABLE IF NOT EXISTS uploads (
+          id TEXT PRIMARY KEY,
+          filename TEXT NOT NULL,
+          data TEXT NOT NULL,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        );`
+      });
+      
+      // Tenta inserir novamente
+      const { error: retryError } = await supabase
+        .from('uploads')
+        .insert({ id: uploadId, filename, data, created_at: new Date().toISOString() });
+
+      if (retryError) {
+        console.error('Erro ao salvar upload:', retryError);
+        return new Response(
+          JSON.stringify({ success: false, error: 'Erro ao salvar arquivo' }),
+          { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        );
+      }
+    }
+
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        data: { 
+          id: uploadId, 
+          url: data, // Retorna o base64 como URL
+          filename 
+        } 
+      }),
+      { status: 201, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+    );
   } catch (error) {
     console.error('Erro no upload:', error);
-    return new Response(JSON.stringify({ success: false, error: 'Erro ao processar upload' }), { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
+    return new Response(
+      JSON.stringify({ success: false, error: 'Erro ao processar upload' }),
+      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+    );
   }
 }
 
-export const config = { runtime: 'nodejs' };
+/**
+ * Handler principal — roteia por método HTTP
+ */
+export async function handler(req) {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: corsHeaders });
+  }
+
+  if (req.method === 'POST') {
+    return uploadImage(req);
+  }
+
+  return new Response(
+    JSON.stringify({ success: false, error: 'Método não permitido' }),
+    { status: 405, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+  );
+}
+
+export default handler;
+export const config = { runtime: 'nodejs22.x' };

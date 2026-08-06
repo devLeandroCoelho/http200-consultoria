@@ -1,6 +1,25 @@
-/* ============================================
-   HTTP200.TI — Landing Page Scripts
-   ============================================ */
+/**
+ * ============================================
+ * HTTP200.TI — Scripts da Landing Page
+ * ============================================
+ * 
+ * Funcionalidades:
+ *   - Loading screen
+ *   - Navbar fixa com scroll
+ *   - Menu mobile responsivo
+ *   - Smooth scroll entre seções
+ *   - Scroll reveal (animações)
+ *   - Contadores animados
+ *   - Partículas no hero
+ *   - Typing effect
+ *   - Botão voltar ao topo
+ * 
+ * Autor: Leandro Coelho
+ * Email: http200.ti@gmail.com
+ * Versão: 1.0.0
+ * Data: 2026-08-06
+ * ============================================
+ */
 
 (function () {
     'use strict';

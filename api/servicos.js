@@ -1,34 +1,33 @@
-import { supabase } from './_lib/supabase.js';
-import { verifyToken } from './auth/verify.js';
+/**
+ * HTTP200.TI Consultoria — Serviços
+ * 
+ * CRUD completo para gerenciamento de serviços da consultoria.
+ * 
+ * Rotas:
+ *   GET    /api/servicos    — Lista todos os serviços (público)
+ *   POST   /api/servicos    — Cria novo serviço (autenticado)
+ *   PUT    /api/servicos    — Atualiza serviço (autenticado)
+ *   DELETE /api/servicos?id — Remove serviço (autenticado)
+ * 
+ * Autor: Leandro Coelho — http200.ti@gmail.com
+ * Versão: 1.0.0
+ * Data: 2026-08-06
+ */
 
+import { supabase } from './_lib/supabase.js';
+import { verifyToken } from './auth.js';
+
+/** Headers CORS */
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-// Rate limiting em memória
-const rateLimitMap = new Map();
-const RATE_LIMIT = 100;
-const RATE_WINDOW = 60 * 1000;
-
-function checkRateLimit(ip) {
-  const now = Date.now();
-  const record = rateLimitMap.get(ip);
-  if (!record || now - record.start > RATE_WINDOW) {
-    rateLimitMap.set(ip, { start: now, count: 1 });
-    return true;
-  }
-  if (record.count >= RATE_LIMIT) return false;
-  record.count++;
-  return true;
-}
-
-function getClientIp(req) {
-  return req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-}
-
-// GET - listar todos (público)
+/**
+ * GET — Lista todos os serviços ativos (público)
+ * Ordena por ordem de exibição
+ */
 async function getServicos() {
   const { data, error } = await supabase
     .from('servicos')
@@ -50,7 +49,13 @@ async function getServicos() {
   );
 }
 
-// POST - criar (autenticado)
+/**
+ * POST — Cria um novo serviço (autenticado)
+ * @body {string} titulo - Título do serviço
+ * @body {string} descricao - Descrição do serviço
+ * @body {string} icon - Nome do ícone (opcional, padrão: 'gear')
+ * @body {number} ordem - Ordem de exibição (opcional)
+ */
 async function createServico(req) {
   const user = verifyToken(req);
   if (!user) {
@@ -64,6 +69,7 @@ async function createServico(req) {
     const body = await req.json();
     const { titulo, descricao, icon, ordem } = body;
 
+    // Validação de campos obrigatórios
     if (!titulo || !descricao) {
       return new Response(
         JSON.stringify({ success: false, error: 'Título e descrição são obrigatórios' }),
@@ -71,6 +77,7 @@ async function createServico(req) {
       );
     }
 
+    // Inserção no banco
     const { data, error } = await supabase
       .from('servicos')
       .insert({
@@ -104,7 +111,14 @@ async function createServico(req) {
   }
 }
 
-// PUT - atualizar (autenticado)
+/**
+ * PUT — Atualiza um serviço existente (autenticado)
+ * @body {string} id - ID do serviço (obrigatório)
+ * @body {string} titulo - Novo título (opcional)
+ * @body {string} descricao - Nova descrição (opcional)
+ * @body {string} icon - Novo ícone (opcional)
+ * @body {number} ordem - Nova ordem (opcional)
+ */
 async function updateServico(req) {
   const user = verifyToken(req);
   if (!user) {
@@ -125,6 +139,7 @@ async function updateServico(req) {
       );
     }
 
+    // Monta objeto de atualização apenas com campos enviados
     const updates = {};
     if (titulo) updates.titulo = String(titulo).trim();
     if (descricao) updates.descricao = String(descricao).trim();
@@ -160,7 +175,10 @@ async function updateServico(req) {
   }
 }
 
-// DELETE - remover (autenticado)
+/**
+ * DELETE — Remove um serviço (soft delete — marca como inativo)
+ * @query {string} id - ID do serviço
+ */
 async function deleteServico(req) {
   const user = verifyToken(req);
   if (!user) {
@@ -181,7 +199,7 @@ async function deleteServico(req) {
       );
     }
 
-    // Soft delete (marca como inativo)
+    // Soft delete — apenas marca como inativo
     const { error } = await supabase
       .from('servicos')
       .update({ ativo: false, updated_at: new Date().toISOString() })
@@ -208,17 +226,12 @@ async function deleteServico(req) {
   }
 }
 
-export default async function handler(req) {
+/**
+ * Handler principal — roteia por método HTTP
+ */
+export async function handler(req) {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders });
-  }
-
-  const ip = getClientIp(req);
-  if (!checkRateLimit(ip)) {
-    return new Response(
-      JSON.stringify({ success: false, error: 'Rate limit excedido. Tente novamente em 1 minuto.' }),
-      { status: 429, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-    );
   }
 
   switch (req.method) {
@@ -234,4 +247,5 @@ export default async function handler(req) {
   }
 }
 
-export const config = { runtime: 'nodejs' };
+export default handler;
+export const config = { runtime: 'nodejs22.x' };

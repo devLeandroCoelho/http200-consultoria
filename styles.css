@@ -1,6 +1,26 @@
-/* ============================================
-   HTTP200.TI — Landing Page Styles
-   ============================================ */
+/**
+ * ============================================
+ * HTTP200.TI — Estilos da Landing Page
+ * ============================================
+ * 
+ * Sistema de design completo com:
+ *   - CSS Variables para fácil manutenção
+ *   - Responsivo (mobile-first)
+ *   - Animações suaves
+ *   - Acessibilidade WCAG 2.1 AA
+ * 
+ * Paleta de cores:
+ *   - Primária: #0f172a (azul escuro)
+ *   - Secundária: #3b82f6 (azul vibrante)
+ *   - Accent: #06b6d4 (ciano)
+ *   - Sucesso: #10b981 (verde)
+ * 
+ * Autor: Leandro Coelho
+ * Email: http200.ti@gmail.com
+ * Versão: 1.0.0
+ * Data: 2026-08-06
+ * ============================================
+ */
 
 /* --- Accessibility --- */
 .sr-only {

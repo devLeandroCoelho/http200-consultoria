@@ -1,43 +1,55 @@
-import { supabase } from './_lib/supabase.js';
-import { verifyToken } from './auth/verify.js';
+/**
+ * HTTP200.TI Consultoria — Configurações
+ * 
+ * Gerencia configurações gerais do site (email, redes sociais, etc.)
+ * 
+ * Rotas:
+ *   GET /api/config  — Retorna configurações (público)
+ *   PUT /api/config  — Atualiza configurações (autenticado)
+ * 
+ * Autor: Leandro Coelho — http200.ti@gmail.com
+ * Versão: 1.0.0
+ * Data: 2026-08-06
+ */
 
+import { supabase } from './_lib/supabase.js';
+import { verifyToken } from './auth.js';
+
+/** Headers CORS */
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
+/** Configurações padrão (usadas quando o banco está vazio) */
 const DEFAULT_CONFIG = {
   email: 'http200.ti@gmail.com',
   linkedin: 'https://linkedin.com/in/devleandrocoelho',
   github: 'https://github.com/devLeandroCoelho'
 };
 
-// GET — público
+/**
+ * GET — Retorna configurações (público)
+ * Se não houver dados no banco, retorna configurações padrão
+ */
 async function getConfig() {
   const { data, error } = await supabase
     .from('config')
     .select('chave, valor');
 
-  if (error) {
-    console.error('Erro ao buscar config:', error);
+  // Em caso de erro ou banco vazio, retorna padrão
+  if (error || !data || data.length === 0) {
     return new Response(
       JSON.stringify({ success: true, data: DEFAULT_CONFIG }),
       { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   }
 
+  // Converte array de {chave, valor} para objeto
   const config = {};
-  if (data && data.length > 0) {
-    for (const item of data) {
-      config[item.chave] = item.valor;
-    }
-  } else {
-    // Se não tem dados, retorna o padrão
-    return new Response(
-      JSON.stringify({ success: true, data: DEFAULT_CONFIG }),
-      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-    );
+  for (const item of data) {
+    config[item.chave] = item.valor;
   }
 
   return new Response(
@@ -46,7 +58,10 @@ async function getConfig() {
   );
 }
 
-// PUT — autenticado
+/**
+ * PUT — Atualiza configurações (autenticado)
+ * @body {Object} body - Chaves a atualizar (email, linkedin, github)
+ */
 async function updateConfig(req) {
   const user = verifyToken(req);
   if (!user) {
@@ -63,7 +78,7 @@ async function updateConfig(req) {
     for (const [key, value] of Object.entries(body)) {
       const sanitized = String(value).trim();
 
-      // Upsert
+      // Upsert: insere ou atualiza
       const { error } = await supabase
         .from('config')
         .upsert(
@@ -95,7 +110,10 @@ async function updateConfig(req) {
   }
 }
 
-export default async function handler(req) {
+/**
+ * Handler principal — roteia por método HTTP
+ */
+export async function handler(req) {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
@@ -111,4 +129,5 @@ export default async function handler(req) {
   }
 }
 
-export const config = { runtime: 'nodejs' };
+export default handler;
+export const config = { runtime: 'nodejs22.x' };
