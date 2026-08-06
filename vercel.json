@@ -1,14 +1,11 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "api/**/*.js", "use": "@vercel/node" },
-    { "src": "*.html", "use": "@vercel/static" }
-  ],
   "outputDirectory": ".",
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/admin", "dest": "/admin.html" },
     { "src": "/login", "dest": "/login.html" },
+    { "src": "/(.*\\.(css|js|png|jpg|gif|svg|ico|json))", "dest": "/$1" },
     { "src": "/(.*)", "dest": "/$1" }
   ]
 }
