@@ -1,34 +1,42 @@
 /**
  * HTTP200.TI Consultoria — Serviços
  * 
- * CRUD completo para gerenciamento de serviços da consultoria.
+ * CRUD completo para gerenciamento de serviços.
  * 
  * Rotas:
- *   GET    /api/servicos    — Lista todos os serviços (público)
- *   POST   /api/servicos    — Cria novo serviço (autenticado)
- *   PUT    /api/servicos    — Atualiza serviço (autenticado)
- *   DELETE /api/servicos?id — Remove serviço (autenticado)
+ *   GET    /api/servicos    — Lista serviços (público)
+ *   POST   /api/servicos    — Cria serviço (auth)
+ *   PUT    /api/servicos    — Atualiza serviço (auth)
+ *   DELETE /api/servicos?id — Remove serviço (auth)
  * 
  * Autor: Leandro Coelho — http200.ti@gmail.com
  * Versão: 1.0.0
- * Data: 2026-08-06
  */
 
-import { supabase } from './_lib/supabase.js';
-import { verifyToken } from './auth.js';
+import { createClient } from '@supabase/supabase-js';
+import jwt from 'jsonwebtoken';
 
-/** Headers CORS */
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const JWT_SECRET = process.env.JWT_SECRET || 'http200ti-fallback-secret';
+
+const supabase = createClient(supabaseUrl || '', supabaseKey || '');
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-/**
- * GET — Lista todos os serviços ativos (público)
- * Ordena por ordem de exibição
- */
-async function getServicos() {
+function verifyToken(req) {
+  const auth = req.headers.get('authorization');
+  if (!auth || !auth.startsWith('Bearer ')) return null;
+  const token = auth.split(' ')[1];
+  try { return jwt.verify(token, JWT_SECRET); } catch { return null; }
+}
+
+/** GET — Lista serviços ativos */
+export async function GET() {
   const { data, error } = await supabase
     .from('servicos')
     .select('*')
@@ -49,14 +57,8 @@ async function getServicos() {
   );
 }
 
-/**
- * POST — Cria um novo serviço (autenticado)
- * @body {string} titulo - Título do serviço
- * @body {string} descricao - Descrição do serviço
- * @body {string} icon - Nome do ícone (opcional, padrão: 'gear')
- * @body {number} ordem - Ordem de exibição (opcional)
- */
-async function createServico(req) {
+/** POST — Cria serviço (autenticado) */
+export async function POST(req) {
   const user = verifyToken(req);
   if (!user) {
     return new Response(
@@ -69,7 +71,6 @@ async function createServico(req) {
     const body = await req.json();
     const { titulo, descricao, icon, ordem } = body;
 
-    // Validação de campos obrigatórios
     if (!titulo || !descricao) {
       return new Response(
         JSON.stringify({ success: false, error: 'Título e descrição são obrigatórios' }),
@@ -77,7 +78,6 @@ async function createServico(req) {
       );
     }
 
-    // Inserção no banco
     const { data, error } = await supabase
       .from('servicos')
       .insert({
@@ -111,15 +111,8 @@ async function createServico(req) {
   }
 }
 
-/**
- * PUT — Atualiza um serviço existente (autenticado)
- * @body {string} id - ID do serviço (obrigatório)
- * @body {string} titulo - Novo título (opcional)
- * @body {string} descricao - Nova descrição (opcional)
- * @body {string} icon - Novo ícone (opcional)
- * @body {number} ordem - Nova ordem (opcional)
- */
-async function updateServico(req) {
+/** PUT — Atualiza serviço (autenticado) */
+export async function PUT(req) {
   const user = verifyToken(req);
   if (!user) {
     return new Response(
@@ -139,7 +132,6 @@ async function updateServico(req) {
       );
     }
 
-    // Monta objeto de atualização apenas com campos enviados
     const updates = {};
     if (titulo) updates.titulo = String(titulo).trim();
     if (descricao) updates.descricao = String(descricao).trim();
@@ -175,11 +167,8 @@ async function updateServico(req) {
   }
 }
 
-/**
- * DELETE — Remove um serviço (soft delete — marca como inativo)
- * @query {string} id - ID do serviço
- */
-async function deleteServico(req) {
+/** DELETE — Remove serviço (autenticado) */
+export async function DELETE(req) {
   const user = verifyToken(req);
   if (!user) {
     return new Response(
@@ -199,7 +188,6 @@ async function deleteServico(req) {
       );
     }
 
-    // Soft delete — apenas marca como inativo
     const { error } = await supabase
       .from('servicos')
       .update({ ativo: false, updated_at: new Date().toISOString() })
@@ -226,26 +214,8 @@ async function deleteServico(req) {
   }
 }
 
-/**
- * Handler principal — roteia por método HTTP
- */
-export async function handler(req) {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: corsHeaders });
-  }
-
-  switch (req.method) {
-    case 'GET': return getServicos();
-    case 'POST': return createServico(req);
-    case 'PUT': return updateServico(req);
-    case 'DELETE': return deleteServico(req);
-    default:
-      return new Response(
-        JSON.stringify({ success: false, error: 'Método não permitido' }),
-        { status: 405, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-      );
-  }
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: corsHeaders });
 }
 
-export default handler;
 export const config = { runtime: 'nodejs' };

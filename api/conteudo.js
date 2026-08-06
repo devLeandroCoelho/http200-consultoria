@@ -7,32 +7,37 @@
  *   GET /api/conteudo  — Retorna todo conteúdo (público)
  *   PUT /api/conteudo  — Atualiza conteúdo (autenticado)
  * 
- * Chaves disponíveis:
- *   hero, sobre, diferenciais, cta
+ * Chaves: hero, sobre, diferenciais, cta
  * 
  * Autor: Leandro Coelho — http200.ti@gmail.com
  * Versão: 1.0.0
- * Data: 2026-08-06
  */
 
-import { supabase } from './_lib/supabase.js';
-import { verifyToken } from './auth.js';
+import { createClient } from '@supabase/supabase-js';
+import jwt from 'jsonwebtoken';
 
-/** Headers CORS */
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const JWT_SECRET = process.env.JWT_SECRET || 'http200ti-fallback-secret';
+
+const supabase = createClient(supabaseUrl || '', supabaseKey || '');
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-/** Chaves permitidas para conteúdo (whitelist de segurança) */
+/** Chaves permitidas (whitelist de segurança) */
 const CONTENT_KEYS = ['hero', 'sobre', 'diferenciais', 'cta'];
 
-/**
- * Remove tags HTML e sanitiza strings
- * @param {*} obj - Objeto a ser sanitizado
- * @returns {*} Objeto sanitizado
- */
+function verifyToken(req) {
+  const auth = req.headers.get('authorization');
+  if (!auth || !auth.startsWith('Bearer ')) return null;
+  const token = auth.split(' ')[1];
+  try { return jwt.verify(token, JWT_SECRET); } catch { return null; }
+}
+
 function sanitizeObject(obj) {
   if (typeof obj === 'string') return obj.trim().replace(/<[^>]*>/g, '');
   if (Array.isArray(obj)) return obj.map(sanitizeObject);
@@ -46,11 +51,8 @@ function sanitizeObject(obj) {
   return obj;
 }
 
-/**
- * GET — Retorna todo conteúdo (público)
- * Agrupa por chave em um objeto único
- */
-async function getConteudo() {
+/** GET — Retorna todo conteúdo */
+export async function GET() {
   const { data, error } = await supabase
     .from('conteudo')
     .select('chave, dados');
@@ -63,7 +65,6 @@ async function getConteudo() {
     );
   }
 
-  // Converte array de {chave, dados} para objeto {hero: {...}, sobre: {...}}
   const conteudo = {};
   if (data) {
     for (const item of data) {
@@ -77,12 +78,8 @@ async function getConteudo() {
   );
 }
 
-/**
- * PUT — Atualiza conteúdo (autenticado)
- * Aceita múltiplas chaves no mesmo request
- * @body {Object} body - Objeto com chaves a atualizar
- */
-async function updateConteudo(req) {
+/** PUT — Atualiza conteúdo (autenticado) */
+export async function PUT(req) {
   const user = verifyToken(req);
   if (!user) {
     return new Response(
@@ -96,7 +93,6 @@ async function updateConteudo(req) {
     const updates = {};
 
     for (const [key, value] of Object.entries(body)) {
-      // Validação: só permite chaves da whitelist
       if (!CONTENT_KEYS.includes(key)) {
         return new Response(
           JSON.stringify({ success: false, error: `Chave '${key}' não é permitida` }),
@@ -105,8 +101,6 @@ async function updateConteudo(req) {
       }
 
       const sanitized = sanitizeObject(value);
-
-      // Upsert: insere ou atualiza
       const { error } = await supabase
         .from('conteudo')
         .upsert(
@@ -138,24 +132,8 @@ async function updateConteudo(req) {
   }
 }
 
-/**
- * Handler principal — roteia por método HTTP
- */
-export async function handler(req) {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: corsHeaders });
-  }
-
-  switch (req.method) {
-    case 'GET': return getConteudo();
-    case 'PUT': return updateConteudo(req);
-    default:
-      return new Response(
-        JSON.stringify({ success: false, error: 'Método não permitido' }),
-        { status: 405, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-      );
-  }
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: corsHeaders });
 }
 
-export default handler;
 export const config = { runtime: 'nodejs' };

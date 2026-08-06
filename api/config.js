@@ -1,7 +1,7 @@
 /**
  * HTTP200.TI Consultoria — Configurações
  * 
- * Gerencia configurações gerais do site (email, redes sociais, etc.)
+ * Gerencia configurações gerais do site.
  * 
  * Rotas:
  *   GET /api/config  — Retorna configurações (público)
@@ -9,36 +9,43 @@
  * 
  * Autor: Leandro Coelho — http200.ti@gmail.com
  * Versão: 1.0.0
- * Data: 2026-08-06
  */
 
-import { supabase } from './_lib/supabase.js';
-import { verifyToken } from './auth.js';
+import { createClient } from '@supabase/supabase-js';
+import jwt from 'jsonwebtoken';
 
-/** Headers CORS */
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const JWT_SECRET = process.env.JWT_SECRET || 'http200ti-fallback-secret';
+
+const supabase = createClient(supabaseUrl || '', supabaseKey || '');
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-/** Configurações padrão (usadas quando o banco está vazio) */
+/** Configurações padrão */
 const DEFAULT_CONFIG = {
   email: 'http200.ti@gmail.com',
   linkedin: 'https://linkedin.com/in/devleandrocoelho',
   github: 'https://github.com/devLeandroCoelho'
 };
 
-/**
- * GET — Retorna configurações (público)
- * Se não houver dados no banco, retorna configurações padrão
- */
-async function getConfig() {
+function verifyToken(req) {
+  const auth = req.headers.get('authorization');
+  if (!auth || !auth.startsWith('Bearer ')) return null;
+  const token = auth.split(' ')[1];
+  try { return jwt.verify(token, JWT_SECRET); } catch { return null; }
+}
+
+/** GET — Retorna configurações */
+export async function GET() {
   const { data, error } = await supabase
     .from('config')
     .select('chave, valor');
 
-  // Em caso de erro ou banco vazio, retorna padrão
   if (error || !data || data.length === 0) {
     return new Response(
       JSON.stringify({ success: true, data: DEFAULT_CONFIG }),
@@ -46,7 +53,6 @@ async function getConfig() {
     );
   }
 
-  // Converte array de {chave, valor} para objeto
   const config = {};
   for (const item of data) {
     config[item.chave] = item.valor;
@@ -58,11 +64,8 @@ async function getConfig() {
   );
 }
 
-/**
- * PUT — Atualiza configurações (autenticado)
- * @body {Object} body - Chaves a atualizar (email, linkedin, github)
- */
-async function updateConfig(req) {
+/** PUT — Atualiza configurações (autenticado) */
+export async function PUT(req) {
   const user = verifyToken(req);
   if (!user) {
     return new Response(
@@ -77,8 +80,6 @@ async function updateConfig(req) {
 
     for (const [key, value] of Object.entries(body)) {
       const sanitized = String(value).trim();
-
-      // Upsert: insere ou atualiza
       const { error } = await supabase
         .from('config')
         .upsert(
@@ -110,24 +111,8 @@ async function updateConfig(req) {
   }
 }
 
-/**
- * Handler principal — roteia por método HTTP
- */
-export async function handler(req) {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: corsHeaders });
-  }
-
-  switch (req.method) {
-    case 'GET': return getConfig();
-    case 'PUT': return updateConfig(req);
-    default:
-      return new Response(
-        JSON.stringify({ success: false, error: 'Método não permitido' }),
-        { status: 405, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-      );
-  }
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: corsHeaders });
 }
 
-export default handler;
 export const config = { runtime: 'nodejs' };

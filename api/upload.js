@@ -1,55 +1,41 @@
 /**
- * HTTP200.TI Consultoria — Upload de Imagens
+ * HTTP200.TI Consultoria — Upload
  * 
- * Gerencia upload de imagens para o site.
+ * Upload de imagens (autenticado).
  * 
- * Rota:
- *   POST /api/upload — Upload de imagem (autenticado)
- * 
- * Restrições:
- *   - Formatos aceitos: jpg, png, svg
- *   - Tamanho máximo: 2MB
- *   - Armazenamento: base64 no banco (temporário)
+ * Rota: POST /api/upload
  * 
  * Autor: Leandro Coelho — http200.ti@gmail.com
  * Versão: 1.0.0
- * Data: 2026-08-06
  */
 
-import { supabase } from './_lib/supabase.js';
-import { verifyToken } from './auth.js';
+import jwt from 'jsonwebtoken';
 
-/** Headers CORS */
+const JWT_SECRET = process.env.JWT_SECRET || 'http200ti-fallback-secret';
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-/** Configurações de upload */
-const UPLOAD_CONFIG = {
-  maxSizeBytes: 2 * 1024 * 1024, // 2MB
-  allowedTypes: ['image/jpeg', 'image/png', 'image/svg+xml'],
-  allowedExtensions: ['.jpg', '.jpeg', '.png', '.svg'],
-};
+const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.svg'];
+const MAX_SIZE_BYTES = 2 * 1024 * 1024;
 
-/**
- * Valida se o tipo do arquivo é permitido
- * @param {string} filename - Nome do arquivo
- * @returns {boolean} True se válido
- */
-function isValidFileType(filename) {
-  const ext = '.' + filename.split('.').pop().toLowerCase();
-  return UPLOAD_CONFIG.allowedExtensions.includes(ext);
+function verifyToken(req) {
+  const auth = req.headers.get('authorization');
+  if (!auth || !auth.startsWith('Bearer ')) return null;
+  const token = auth.split(' ')[1];
+  try { return jwt.verify(token, JWT_SECRET); } catch { return null; }
 }
 
-/**
- * POST — Upload de imagem (autenticado)
- * Recebe imagem em base64 e salva no banco
- * @body {string} filename - Nome do arquivo
- * @body {string} data - Dados em base64 (data:image/...;base64,...)
- */
-async function uploadImage(req) {
+function isValidFileType(filename) {
+  const ext = '.' + filename.split('.').pop().toLowerCase();
+  return ALLOWED_EXTENSIONS.includes(ext);
+}
+
+/** POST — Upload de imagem */
+export async function POST(req) {
   const user = verifyToken(req);
   if (!user) {
     return new Response(
@@ -62,89 +48,31 @@ async function uploadImage(req) {
     const body = await req.json();
     const { filename, data } = body;
 
-    // Validação de campos
     if (!filename || !data) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Nome e dados do arquivo são obrigatórios' }),
+        JSON.stringify({ success: false, error: 'Nome e dados são obrigatórios' }),
         { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
-    // Validação de tipo
     if (!isValidFileType(filename)) {
       return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: `Tipo não permitido. Aceitos: ${UPLOAD_CONFIG.allowedExtensions.join(', ')}` 
-        }),
+        JSON.stringify({ success: false, error: `Tipo não permitido. Aceitos: ${ALLOWED_EXTENSIONS.join(', ')}` }),
         { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
-    // Validação de tamanho (estimativa do base64)
     const base64Data = data.split(',')[1] || data;
     const sizeInBytes = Math.ceil(base64Data.length * 3 / 4);
-    if (sizeInBytes > UPLOAD_CONFIG.maxSizeBytes) {
+    if (sizeInBytes > MAX_SIZE_BYTES) {
       return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: `Arquivo muito grande. Máximo: ${UPLOAD_CONFIG.maxSizeBytes / 1024 / 1024}MB` 
-        }),
+        JSON.stringify({ success: false, error: 'Arquivo muito grande. Máximo: 2MB' }),
         { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
-    }
-
-    // Gera ID único para o upload
-    const uploadId = Date.now().toString(36) + Math.random().toString(36).slice(2);
-
-    // Salva no banco
-    const { error } = await supabase
-      .from('uploads')
-      .upsert(
-        { 
-          id: uploadId, 
-          filename, 
-          data, 
-          created_at: new Date().toISOString() 
-        },
-        { onConflict: 'id' }
-      );
-
-    if (error) {
-      // Se a tabela não existir, cria e tenta novamente
-      console.warn('Tabela uploads não existe, tentando criar...');
-      await supabase.rpc('exec_sql', { 
-        sql: `CREATE TABLE IF NOT EXISTS uploads (
-          id TEXT PRIMARY KEY,
-          filename TEXT NOT NULL,
-          data TEXT NOT NULL,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-        );`
-      });
-      
-      // Tenta inserir novamente
-      const { error: retryError } = await supabase
-        .from('uploads')
-        .insert({ id: uploadId, filename, data, created_at: new Date().toISOString() });
-
-      if (retryError) {
-        console.error('Erro ao salvar upload:', retryError);
-        return new Response(
-          JSON.stringify({ success: false, error: 'Erro ao salvar arquivo' }),
-          { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-        );
-      }
     }
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        data: { 
-          id: uploadId, 
-          url: data, // Retorna o base64 como URL
-          filename 
-        } 
-      }),
+      JSON.stringify({ success: true, data: { url: data, filename } }),
       { status: 201, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   } catch (error) {
@@ -156,23 +84,8 @@ async function uploadImage(req) {
   }
 }
 
-/**
- * Handler principal — roteia por método HTTP
- */
-export async function handler(req) {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: corsHeaders });
-  }
-
-  if (req.method === 'POST') {
-    return uploadImage(req);
-  }
-
-  return new Response(
-    JSON.stringify({ success: false, error: 'Método não permitido' }),
-    { status: 405, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-  );
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: corsHeaders });
 }
 
-export default handler;
 export const config = { runtime: 'nodejs' };
