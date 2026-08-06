@@ -175,4 +175,4 @@ export async function handler(req) {
 }
 
 export default handler;
-export const config = { runtime: 'nodejs22.x' };
+export const config = { runtime: 'nodejs' };
