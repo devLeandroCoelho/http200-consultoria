@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HTTP200.TI — Consultoria especializada em DevOps, Backend, IA e Transformação Digital. Soluções que conectam tecnologia ao resultado.">
+    <meta name="keywords" content="consultoria TI, DevOps, desenvolvimento backend, inteligência artificial, transformação digital, automação">
+    <meta name="author" content="HTTP200.TI">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="HTTP200.TI — Consultoria de TI">
+    <meta property="og:description" content="Soluções que conectam tecnologia ao resultado. Consultoria especializada em DevOps, Backend, IA e Transformação Digital.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://http200.ti">
+    <meta property="og:locale" content="pt_BR">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="HTTP200.TI — Consultoria de TI">
+    <meta name="twitter:description" content="Soluções que conectam tecnologia ao resultado.">
+
+    <title>HTTP200.TI — Consultoria de TI | DevOps, Backend, IA</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖥️</text></svg>">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Loading -->
+    <div class="loading" id="loading" aria-hidden="true">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="navbar" id="navbar" role="banner">
+        <nav class="navbar-container" aria-label="Navegação principal">
+            <a href="#hero" class="navbar-logo" aria-label="HTTP200.TI — Ir para o início">
+                <span class="logo-bracket">&lt;</span>HTTP200<span class="logo-dot">.</span>TI<span class="logo-bracket">/&gt;</span>
+            </a>
+
+            <ul class="navbar-links" id="navLinks" role="menubar">
+                <li role="none"><a href="#servicos" role="menuitem" class="nav-link">Serviços</a></li>
+                <li role="none"><a href="#sobre" role="menuitem" class="nav-link">Sobre</a></li>
+                <li role="none"><a href="#diferenciais" role="menuitem" class="nav-link">Diferenciais</a></li>
+                <li role="none"><a href="#contato" role="menuitem" class="nav-link">Contato</a></li>
+            </ul>
+
+            <a href="#contato" class="navbar-cta" aria-label="Fale Conosco">Fale Conosco</a>
+
+            <button
+                class="navbar-toggle"
+                id="navToggle"
+                aria-label="Abrir menu de navegação"
+                aria-expanded="false"
+                aria-controls="navLinks"
+            >
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <main>
+        <section class="hero" id="hero" aria-label="Seção principal">
+            <div class="hero-bg">
+                <canvas id="particleCanvas" aria-hidden="true"></canvas>
+                <div class="hero-gradient" aria-hidden="true"></div>
+            </div>
+
+            <div class="hero-content">
+                <p class="hero-badge" aria-hidden="true">
+                    <span class="badge-dot"></span>
+                    Consultoria de TI
+                </p>
+                <h1 class="hero-title">
+                    Soluções que conectam<br>
+                    <span class="hero-title-accent" id="heroAccent" aria-live="polite">tecnologia ao resultado
+                        <noscript>tecnologia ao resultado, inovação ao negócio, eficiência à operação, código à estratégia</noscript>
+                    </span>
+                </h1>
+                <p class="hero-subtitle">
+                    Consultoria especializada em DevOps, Backend, IA e Transformação Digital
+                </p>
+                <div class="hero-buttons">
+                    <a href="#servicos" class="btn btn-outline" aria-label="Conhecer nossos serviços">
+                        <span>Nossos Serviços</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </a>
+                    <a href="#contato" class="btn btn-primary" aria-label="Fale conosco agora">
+                        <span>Fale Conosco</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <a href="#servicos" class="scroll-indicator" aria-label="Rolar para baixo">
+                <div class="scroll-mouse" aria-hidden="true">
+                    <div class="scroll-wheel"></div>
+                </div>
+                <span class="scroll-text">Scroll</span>
+            </a>
+        </section>
+
+        <!-- Serviços -->
+        <section class="services" id="servicos" aria-labelledby="services-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">O que fazemos</span>
+                    <h2 class="section-title" id="services-title">Nossos Serviços</h2>
+                    <p class="section-subtitle">
+                        Soluções completas para cada etapa da sua jornada tecnológica
+                    </p>
+                </div>
+
+                <div class="services-grid">
+                    <!-- Card 1: DevOps -->
+                    <article class="service-card" aria-label="Serviço de DevOps e Automação">
+                        <div class="service-icon" aria-hidden="true">
+                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="32" cy="32" r="12" stroke-dasharray="4 4"/>
+                                <path d="M32 8v8M32 48v8M8 32h8M48 32h8"/>
+                                <path d="M16 16l6 6M42 42l6 6M16 48l6-6M42 22l6-6"/>
+                                <circle cx="32" cy="32" r="4" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <h3 class="service-title">DevOps & Automação</h3>
+                        <p class="service-desc">
+                            Pipelines CI/CD, infraestrutura como código, containerização e automação completa do ciclo de vida do software.
+                        </p>
+                        <span class="service-link" aria-hidden="true">
+                            Saiba mais
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </span>
+                    </article>
+
+                    <!-- Card 2: Backend -->
+                    <article class="service-card" aria-label="Serviço de Desenvolvimento Backend">
+                        <div class="service-icon" aria-hidden="true">
+                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="8" y="12" width="48" height="40" rx="4"/>
+                                <path d="M20 24l-6 6 6 6"/>
+                                <path d="M44 24l6 6-6 6"/>
+                                <line x1="32" y1="20" x2="28" y2="44"/>
+                                <circle cx="12" cy="20" r="1.5" fill="currentColor"/>
+                                <circle cx="12" cy="28" r="1.5" fill="currentColor"/>
+                                <circle cx="12" cy="36" r="1.5" fill="currentColor"/>
+                                <circle cx="12" cy="44" r="1.5" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <h3 class="service-title">Desenvolvimento Backend</h3>
+                        <p class="service-desc">
+                            APIs robustas, microsserviços escaláveis e arquiteturas modernas com Node.js, Python e as melhores práticas do mercado.
+                        </p>
+                        <span class="service-link" aria-hidden="true">
+                            Saiba mais
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </span>
+                    </article>
+
+                    <!-- Card 3: IA -->
+                    <article class="service-card" aria-label="Serviço de Inteligência Artificial">
+                        <div class="service-icon" aria-hidden="true">
+                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2">
+                                <ellipse cx="32" cy="28" rx="18" ry="16"/>
+                                <path d="M20 44c0 6 5 12 12 12s12-6 12-12"/>
+                                <path d="M26 24c0-3 3-6 6-6s6 3 6 6"/>
+                                <circle cx="26" cy="26" r="2" fill="currentColor"/>
+                                <circle cx="38" cy="26" r="2" fill="currentColor"/>
+                                <path d="M28 32c0 2 2 4 4 4s4-2 4-4"/>
+                                <line x1="18" y1="16" x2="14" y2="10"/>
+                                <line x1="46" y1="16" x2="50" y2="10"/>
+                                <circle cx="14" cy="10" r="2" fill="currentColor"/>
+                                <circle cx="50" cy="10" r="2" fill="currentColor"/>
+                                <line x1="14" y1="12" x2="14" y2="28"/>
+                                <line x1="50" y1="12" x2="50" y2="28"/>
+                                <line x1="12" y1="28" x2="16" y2="28"/>
+                                <line x1="48" y1="28" x2="52" y2="28"/>
+                            </svg>
+                        </div>
+                        <h3 class="service-title">Inteligência Artificial</h3>
+                        <p class="service-desc">
+                            Integração de IA generativa, automação inteligente, análise de dados e soluções personalizadas para seu negócio.
+                        </p>
+                        <span class="service-link" aria-hidden="true">
+                            Saiba mais
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </span>
+                    </article>
+
+                    <!-- Card 4: Integrações -->
+                    <article class="service-card" aria-label="Serviço de Integrações de Sistemas">
+                        <div class="service-icon" aria-hidden="true">
+                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="8" y="8" width="18" height="18" rx="4"/>
+                                <rect x="38" y="8" width="18" height="18" rx="4"/>
+                                <rect x="8" y="38" width="18" height="18" rx="4"/>
+                                <rect x="38" y="38" width="18" height="18" rx="4"/>
+                                <line x1="26" y1="17" x2="38" y2="17" stroke-dasharray="3 3"/>
+                                <line x1="26" y1="47" x2="38" y2="47" stroke-dasharray="3 3"/>
+                                <line x1="17" y1="26" x2="17" y2="38" stroke-dasharray="3 3"/>
+                                <line x1="47" y1="26" x2="47" y2="38" stroke-dasharray="3 3"/>
+                                <circle cx="32" cy="32" r="3" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <h3 class="service-title">Integrações de Sistemas</h3>
+                        <p class="service-desc">
+                            Conecte seus sistemas, APIs e ferramentas em um ecossistema coeso. Integrações seguras e escaláveis.
+                        </p>
+                        <span class="service-link" aria-hidden="true">
+                            Saiba mais
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </span>
+                    </article>
+
+                    <!-- Card 5: Processos -->
+                    <article class="service-card" aria-label="Serviço de Processos de TI">
+                        <div class="service-icon" aria-hidden="true">
+                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="8" y="8" width="48" height="48" rx="4"/>
+                                <polyline points="16,44 24,32 32,38 40,24 48,28"/>
+                                <circle cx="24" cy="32" r="2" fill="currentColor"/>
+                                <circle cx="32" cy="38" r="2" fill="currentColor"/>
+                                <circle cx="40" cy="24" r="2" fill="currentColor"/>
+                                <circle cx="48" cy="28" r="2" fill="currentColor"/>
+                                <line x1="16" y1="16" x2="48" y2="16"/>
+                                <line x1="16" y1="52" x2="48" y2="52"/>
+                            </svg>
+                        </div>
+                        <h3 class="service-title">Processos de TI</h3>
+                        <p class="service-desc">
+                            ITIL, governança, gestão de incidentes e melhoria contínua. Transforme seu departamento de TI em um parceiro estratégico.
+                        </p>
+                        <span class="service-link" aria-hidden="true">
+                            Saiba mais
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </span>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sobre / Quem Somos -->
+        <section class="about" id="sobre" aria-labelledby="about-title">
+            <div class="container">
+                <div class="about-grid">
+                    <div class="about-content">
+                        <span class="section-tag">Quem Somos</span>
+                        <h2 class="section-title" id="about-title">
+                            Experiência que gera<br>
+                            <span class="text-accent">resultados reais</span>
+                        </h2>
+                        <p class="about-text">
+                            Com mais de 15 anos de experiência em TI — da infraestrutura e suporte ao desenvolvimento de software e DevOps — a <strong>HTTP200.TI</strong> nasceu da necessidade real de empresas que precisam de soluções técnicas eficientes, sem burocracia.
+                        </p>
+                        <p class="about-text">
+                            Conhecemos a dor do time de TI porque já estivemos do outro lado. Sabemos o que funciona, o que não funciona e, principalmente, o que realmente faz diferença no dia a dia da operação.
+                        </p>
+                        <div class="about-signature">
+                            <div class="signature-line"></div>
+                            <span>Leandro Coelho — Fundador</span>
+                        </div>
+                    </div>
+
+                    <div class="about-stats" aria-label="Estatísticas da empresa">
+                        <div class="stat-card" data-target="15">
+                            <span class="stat-number" aria-hidden="true">0</span>
+                            <span class="stat-suffix" aria-hidden="true">+</span>
+                            <span class="sr-only">Mais de 15</span>
+                            <span class="stat-label">Anos de Experiência</span>
+                        </div>
+                        <div class="stat-card" data-target="50">
+                            <span class="stat-number" aria-hidden="true">0</span>
+                            <span class="stat-suffix" aria-hidden="true">+</span>
+                            <span class="sr-only">Mais de 50</span>
+                            <span class="stat-label">Projetos Entregues</span>
+                        </div>
+                        <div class="stat-card" data-target="98">
+                            <span class="stat-number" aria-hidden="true">0</span>
+                            <span class="stat-suffix" aria-hidden="true">%</span>
+                            <span class="sr-only">98%</span>
+                            <span class="stat-label">Clientes Satisfeitos</span>
+                        </div>
+                        <div class="stat-card stat-card-highlight">
+                            <span class="stat-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                            </span>
+                            <span class="stat-label">Suporte 24/7</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Diferenciais -->
+        <section class="differentials" id="diferenciais" aria-labelledby="diff-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Por que nós</span>
+                    <h2 class="section-title" id="diff-title">
+                        Por que escolher a <span class="text-accent">HTTP200.TI</span>?
+                    </h2>
+                </div>
+
+                <div class="diff-grid">
+                    <article class="diff-card" tabindex="0">
+                        <div class="diff-icon" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M24 4l4 8h9l-7 6 3 9-9-5-9 5 3-9-7-6h9z"/>
+                                <path d="M12 32h24M14 40h20"/>
+                            </svg>
+                        </div>
+                        <h3 class="diff-title">Experiência Real</h3>
+                        <p class="diff-desc">
+                            Não somos teóricos. Cada solução já foi testada em produção.
+                        </p>
+                    </article>
+
+                    <article class="diff-card" tabindex="0">
+                        <div class="diff-icon" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="24" cy="24" r="18"/>
+                                <path d="M24 12v12l8 4"/>
+                                <path d="M36 36l4 4M12 36l-4 4"/>
+                            </svg>
+                        </div>
+                        <h3 class="diff-title">Foco em Resultado</h3>
+                        <p class="diff-desc">
+                            Medimos sucesso pelo impacto no seu negócio, não pelo código entregue.
+                        </p>
+                    </article>
+
+                    <article class="diff-card" tabindex="0">
+                        <div class="diff-icon" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 36V12a4 4 0 014-4h24a4 4 0 014 4v16a4 4 0 01-4 4H16l-8 8z"/>
+                                <path d="M16 20h16M16 26h10"/>
+                            </svg>
+                        </div>
+                        <h3 class="diff-title">Comunicação Clara</h3>
+                        <p class="diff-desc">
+                            Sem jargão desnecessário. Você entende exatamente o que está recebendo.
+                        </p>
+                    </article>
+
+                    <article class="diff-card" tabindex="0">
+                        <div class="diff-icon" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M24 4v40M4 24h40"/>
+                                <path d="M8 8l32 32M40 8L8 40"/>
+                                <circle cx="24" cy="24" r="6" fill="currentColor"/>
+                                <path d="M18 4l6 8 6-8"/>
+                                <path d="M18 44l6-8 6 8"/>
+                            </svg>
+                        </div>
+                        <h3 class="diff-title">Agilidade</h3>
+                        <p class="diff-desc">
+                            Metodologias ágeis aplicadas de verdade. Entregas incrementais e rápidas.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Final -->
+        <section class="cta-section" id="contato" aria-labelledby="cta-title">
+            <div class="cta-bg" aria-hidden="true"></div>
+            <div class="container">
+                <div class="cta-content">
+                    <h2 class="cta-title" id="cta-title">
+                        Pronto para transformar<br>sua operação?
+                    </h2>
+                    <p class="cta-subtitle">
+                        Entre em contato e descubra como podemos ajudar
+                    </p>
+                    <a href="mailto:http200.ti@gmail.com" class="btn btn-cta" aria-label="Enviar email para http200.ti@gmail.com">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <rect x="2" y="4" width="20" height="16" rx="2"/>
+                            <path d="M22 4L12 13 2 4"/>
+                        </svg>
+                        <span>Enviar Mensagem</span>
+                    </a>
+
+                    <div class="cta-socials" aria-label="Redes sociais">
+                        <a href="https://linkedin.com/in/devleandrocoelho" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="LinkedIn">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                            </svg>
+                        </a>
+                        <a href="https://github.com/devLeandroCoelho" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="GitHub">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </a>
+                        <a href="mailto:http200.ti@gmail.com" class="social-link" aria-label="Enviar email">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                                <path d="M22 4L12 13 2 4"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer" role="contentinfo">
+            <div class="container">
+                <div class="footer-grid">
+                    <div class="footer-brand">
+                        <a href="#hero" class="footer-logo" aria-label="HTTP200.TI — Voltar ao início">
+                            <span class="logo-bracket">&lt;</span>HTTP200<span class="logo-dot">.</span>TI<span class="logo-bracket">/&gt;</span>
+                        </a>
+                        <p class="footer-tagline">
+                            Soluções que conectam tecnologia ao resultado.
+                        </p>
+                    </div>
+
+                    <div class="footer-links">
+                        <h3 class="footer-heading">Navegação</h3>
+                        <ul>
+                            <li><a href="#servicos">Serviços</a></li>
+                            <li><a href="#sobre">Sobre</a></li>
+                            <li><a href="#diferenciais">Diferenciais</a></li>
+                            <li><a href="#contato">Contato</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-links">
+                        <h3 class="footer-heading">Serviços</h3>
+                        <ul>
+                            <li><a href="#servicos">DevOps & Automação</a></li>
+                            <li><a href="#servicos">Desenvolvimento Backend</a></li>
+                            <li><a href="#servicos">Inteligência Artificial</a></li>
+                            <li><a href="#servicos">Integrações</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-contact">
+                        <h3 class="footer-heading">Contato</h3>
+                        <ul>
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                                    <path d="M22 4L12 13 2 4"/>
+                                </svg>
+                                <a href="mailto:http200.ti@gmail.com">http200.ti@gmail.com</a>
+                            </li>
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                </svg>
+                                <span>Brasil — Atendimento Remoto</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>&copy; 2026 HTTP200.TI — Todos os direitos reservados</p>
+                    <p class="footer-credits">
+                        Desenvolvido com <span class="heart" aria-label="amor">♥</span> e <span class="text-accent">&lt;código/&gt;</span>
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Botão Voltar ao Topo -->
+        <button
+            class="back-to-top"
+            id="backToTop"
+            aria-label="Voltar ao topo da página"
+            title="Voltar ao topo"
+        >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M18 15l-6-6-6 6"/>
+            </svg>
+        </button>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
