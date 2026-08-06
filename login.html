@@ -258,7 +258,7 @@
       setLoading(true);
 
       try {
-        const res = await fetch('/api/auth/login', {
+        const res = await fetch('/api/auth', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ usuario, senha })
@@ -272,7 +272,7 @@
           return;
         }
 
-        localStorage.setItem('admin_token', data.token);
+        localStorage.setItem('admin_token', data.data.token);
         window.location.href = '/admin.html';
       } catch (err) {
         showError('Erro de conexão. Tente novamente.');
