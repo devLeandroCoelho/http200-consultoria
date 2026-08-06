@@ -48,6 +48,9 @@ export default async function handler(req) {
       upload: {
         'POST /api/upload': 'Upload de imagem (autenticado)',
       },
+      migration: {
+        'POST /api/migration': 'Executar SQL de criação de tabelas e dados iniciais',
+      },
     },
     docs: 'https://github.com/devLeandroCoelho/http200-consultoria',
   };
