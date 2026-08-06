@@ -1,0 +1,8 @@
+{
+  "name": "http200-consultoria",
+  "version": "1.0.0",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "jsonwebtoken": "^9.0.0"
+  }
+}
