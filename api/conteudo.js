@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { supabase } from './_lib/supabase.js';
 import { verifyToken } from './auth/verify.js';
 
 const corsHeaders = {
@@ -44,11 +44,25 @@ function sanitizeObject(obj) {
 
 // GET - retornar todo conteúdo (público)
 async function getConteudo() {
-  const conteudo = {};
-  for (const key of CONTENT_KEYS) {
-    const data = await kv.get(`conteudo:${key}`);
-    if (data) conteudo[key] = data;
+  const { data, error } = await supabase
+    .from('conteudo')
+    .select('chave, dados');
+
+  if (error) {
+    console.error('Erro ao buscar conteúdo:', error);
+    return new Response(
+      JSON.stringify({ success: false, error: 'Erro ao buscar conteúdo' }),
+      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+    );
   }
+
+  const conteudo = {};
+  if (data) {
+    for (const item of data) {
+      conteudo[item.chave] = item.dados;
+    }
+  }
+
   return new Response(
     JSON.stringify({ success: true, data: conteudo }),
     { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
@@ -64,9 +78,11 @@ async function updateConteudo(req) {
       { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   }
+
   try {
     const body = await req.json();
     const updates = {};
+
     for (const [key, value] of Object.entries(body)) {
       if (!CONTENT_KEYS.includes(key)) {
         return new Response(
@@ -75,9 +91,26 @@ async function updateConteudo(req) {
         );
       }
       const sanitized = sanitizeObject(value);
-      await kv.set(`conteudo:${key}`, sanitized);
+
+      // Upsert (insert ou update)
+      const { error } = await supabase
+        .from('conteudo')
+        .upsert(
+          { chave: key, dados: sanitized, updated_at: new Date().toISOString() },
+          { onConflict: 'chave' }
+        );
+
+      if (error) {
+        console.error(`Erro ao atualizar conteúdo ${key}:`, error);
+        return new Response(
+          JSON.stringify({ success: false, error: `Erro ao atualizar ${key}` }),
+          { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        );
+      }
+
       updates[key] = sanitized;
     }
+
     return new Response(
       JSON.stringify({ success: true, data: updates }),
       { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
@@ -95,6 +128,7 @@ export default async function handler(req) {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
+
   const ip = getClientIp(req);
   if (!checkRateLimit(ip)) {
     return new Response(
@@ -102,6 +136,7 @@ export default async function handler(req) {
       { status: 429, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   }
+
   switch (req.method) {
     case 'GET': return getConteudo();
     case 'PUT': return updateConteudo(req);

@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { supabase } from './_lib/supabase.js';
 import { verifyToken } from './auth/verify.js';
 
 const corsHeaders = {
@@ -30,21 +30,22 @@ function getClientIp(req) {
 
 // GET - listar todos (público)
 async function getServicos() {
-  const keys = await kv.keys('servicos:*');
-  if (!keys || keys.length === 0) {
+  const { data, error } = await supabase
+    .from('servicos')
+    .select('*')
+    .eq('ativo', true)
+    .order('ordem', { ascending: true });
+
+  if (error) {
+    console.error('Erro ao buscar serviços:', error);
     return new Response(
-      JSON.stringify({ success: true, data: [] }),
-      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      JSON.stringify({ success: false, error: 'Erro ao buscar serviços' }),
+      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   }
-  const servicos = [];
-  for (const key of keys) {
-    const s = await kv.get(key);
-    if (s) servicos.push(s);
-  }
-  servicos.sort((a, b) => (a.ordem || 0) - (b.ordem || 0));
+
   return new Response(
-    JSON.stringify({ success: true, data: servicos }),
+    JSON.stringify({ success: true, data: data || [] }),
     { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
   );
 }
@@ -58,27 +59,40 @@ async function createServico(req) {
       { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   }
+
   try {
     const body = await req.json();
     const { titulo, descricao, icon, ordem } = body;
+
     if (!titulo || !descricao) {
       return new Response(
         JSON.stringify({ success: false, error: 'Título e descrição são obrigatórios' }),
         { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
-    const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
-    const servico = {
-      id,
-      titulo: String(titulo).trim(),
-      descricao: String(descricao).trim(),
-      icon: String(icon || 'gear').trim(),
-      ordem: Number(ordem) || 0,
-      criadoEm: new Date().toISOString(),
-    };
-    await kv.set(`servicos:${id}`, servico);
+
+    const { data, error } = await supabase
+      .from('servicos')
+      .insert({
+        titulo: String(titulo).trim(),
+        descricao: String(descricao).trim(),
+        icon: String(icon || 'gear').trim(),
+        ordem: Number(ordem) || 0,
+        ativo: true
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Erro ao criar serviço:', error);
+      return new Response(
+        JSON.stringify({ success: false, error: 'Erro ao criar serviço' }),
+        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
+
     return new Response(
-      JSON.stringify({ success: true, data: servico }),
+      JSON.stringify({ success: true, data }),
       { status: 201, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   } catch (error) {
@@ -99,33 +113,42 @@ async function updateServico(req) {
       { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   }
+
   try {
     const body = await req.json();
     const { id, titulo, descricao, icon, ordem } = body;
+
     if (!id) {
       return new Response(
         JSON.stringify({ success: false, error: 'ID é obrigatório' }),
         { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
-    const existing = await kv.get(`servicos:${id}`);
-    if (!existing) {
+
+    const updates = {};
+    if (titulo) updates.titulo = String(titulo).trim();
+    if (descricao) updates.descricao = String(descricao).trim();
+    if (icon) updates.icon = String(icon).trim();
+    if (ordem !== undefined) updates.ordem = Number(ordem);
+    updates.updated_at = new Date().toISOString();
+
+    const { data, error } = await supabase
+      .from('servicos')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Erro ao atualizar serviço:', error);
       return new Response(
         JSON.stringify({ success: false, error: 'Serviço não encontrado' }),
         { status: 404, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
-    const updated = {
-      ...existing,
-      ...(titulo && { titulo: String(titulo).trim() }),
-      ...(descricao && { descricao: String(descricao).trim() }),
-      ...(icon && { icon: String(icon).trim() }),
-      ...(ordem !== undefined && { ordem: Number(ordem) }),
-      atualizadoEm: new Date().toISOString(),
-    };
-    await kv.set(`servicos:${id}`, updated);
+
     return new Response(
-      JSON.stringify({ success: true, data: updated }),
+      JSON.stringify({ success: true, data }),
       { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   } catch (error) {
@@ -146,23 +169,32 @@ async function deleteServico(req) {
       { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   }
+
   try {
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
+
     if (!id) {
       return new Response(
         JSON.stringify({ success: false, error: 'ID é obrigatório' }),
         { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
-    const existing = await kv.get(`servicos:${id}`);
-    if (!existing) {
+
+    // Soft delete (marca como inativo)
+    const { error } = await supabase
+      .from('servicos')
+      .update({ ativo: false, updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Erro ao remover serviço:', error);
       return new Response(
-        JSON.stringify({ success: false, error: 'Serviço não encontrado' }),
-        { status: 404, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        JSON.stringify({ success: false, error: 'Erro ao remover serviço' }),
+        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
-    await kv.del(`servicos:${id}`);
+
     return new Response(
       JSON.stringify({ success: true, message: 'Serviço removido com sucesso' }),
       { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
