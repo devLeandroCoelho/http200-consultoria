@@ -439,6 +439,61 @@
         });
     }
 
+    // --- SVG Icons Map ---
+    const SERVICE_ICONS = {
+        gear: '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><circle cx="32" cy="32" r="12" stroke-dasharray="4 4"/><path d="M32 8v8M32 48v8M8 32h8M48 32h8"/><path d="M16 16l6 6M42 42l6 6M16 48l6-6M42 22l6-6"/><circle cx="32" cy="32" r="4" fill="currentColor"/></svg>',
+        code: '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="12" width="48" height="40" rx="4"/><path d="M20 24l-6 6 6 6"/><path d="M44 24l6 6-6 6"/><line x1="32" y1="20" x2="28" y2="44"/><circle cx="12" cy="20" r="1.5" fill="currentColor"/><circle cx="12" cy="28" r="1.5" fill="currentColor"/><circle cx="12" cy="36" r="1.5" fill="currentColor"/><circle cx="12" cy="44" r="1.5" fill="currentColor"/></svg>',
+        brain: '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="32" cy="28" rx="18" ry="16"/><path d="M20 44c0 6 5 12 12 12s12-6 12-12"/><path d="M26 24c0-3 3-6 6-6s6 3 6 6"/><circle cx="26" cy="26" r="2" fill="currentColor"/><circle cx="38" cy="26" r="2" fill="currentColor"/><path d="M28 32c0 2 2 4 4 4s4-2 4-4"/><line x1="18" y1="16" x2="14" y2="10"/><line x1="46" y1="16" x2="50" y2="10"/><circle cx="14" cy="10" r="2" fill="currentColor"/><circle cx="50" cy="10" r="2" fill="currentColor"/><line x1="14" y1="12" x2="14" y2="28"/><line x1="50" y1="12" x2="50" y2="28"/><line x1="12" y1="28" x2="16" y2="28"/><line x1="48" y1="28" x2="52" y2="28"/></svg>',
+        link: '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="18" height="18" rx="4"/><rect x="38" y="8" width="18" height="18" rx="4"/><rect x="8" y="38" width="18" height="18" rx="4"/><rect x="38" y="38" width="18" height="18" rx="4"/><line x1="26" y1="17" x2="38" y2="17" stroke-dasharray="3 3"/><line x1="26" y1="47" x2="38" y2="47" stroke-dasharray="3 3"/><line x1="17" y1="26" x2="17" y2="38" stroke-dasharray="3 3"/><line x1="47" y1="26" x2="47" y2="38" stroke-dasharray="3 3"/><circle cx="32" cy="32" r="3" fill="currentColor"/></svg>',
+        chart: '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="48" height="48" rx="4"/><polyline points="16,44 24,32 32,38 40,24 48,28"/><circle cx="24" cy="32" r="2" fill="currentColor"/><circle cx="32" cy="38" r="2" fill="currentColor"/><circle cx="40" cy="24" r="2" fill="currentColor"/><circle cx="48" cy="28" r="2" fill="currentColor"/><line x1="16" y1="16" x2="48" y2="16"/><line x1="16" y1="52" x2="48" y2="52"/></svg>',
+        default: '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><circle cx="32" cy="32" r="20"/><path d="M24 32h16M32 24v16"/></svg>'
+    };
+
+    // --- Load Services from API ---
+    async function loadServices() {
+        const container = document.getElementById('services-container');
+        if (!container) return;
+
+        try {
+            const res = await fetch('/api/servicos');
+            const json = await res.json();
+
+            if (!json.success || !Array.isArray(json.data) || json.data.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#64748b;grid-column:1/-1;">Nenhum serviço encontrado.</p>';
+                return;
+            }
+
+            container.innerHTML = json.data.map(s => {
+                const icon = SERVICE_ICONS[s.icon] || SERVICE_ICONS.default;
+                return `
+                    <article class="service-card" aria-label="Serviço de ${escapeHtml(s.titulo)}">
+                        <div class="service-icon" aria-hidden="true">${icon}</div>
+                        <h3 class="service-title">${escapeHtml(s.titulo)}</h3>
+                        <p class="service-desc">${escapeHtml(s.descricao)}</p>
+                        <span class="service-link" aria-hidden="true">
+                            Saiba mais
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </span>
+                    </article>
+                `;
+            }).join('');
+
+            // Re-init hover feedback for new cards
+            initHoverFeedback();
+        } catch (err) {
+            console.error('Erro ao carregar serviços:', err);
+            container.innerHTML = '<p style="text-align:center;color:#64748b;grid-column:1/-1;">Erro ao carregar serviços.</p>';
+        }
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+    }
+
     // --- Initialize All ---
     document.addEventListener('DOMContentLoaded', () => {
         initScrollReveal();
@@ -446,6 +501,7 @@
         initParticles();
         initTypingEffect();
         initHoverFeedback();
+        loadServices();
     });
 
 })();
