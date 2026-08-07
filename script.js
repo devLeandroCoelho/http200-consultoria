@@ -541,6 +541,101 @@
         }
     });
 
+    // --- Load Content from API ---
+    async function loadContent() {
+        try {
+            const res = await fetch('/api/conteudo');
+            const json = await res.json();
+
+            if (!json.success || !json.data) return;
+
+            const c = json.data;
+
+            // Hero
+            if (c.hero) {
+                const heroTitle = document.querySelector('.hero-title');
+                const heroSubtitle = document.querySelector('.hero-subtitle');
+                const heroCta = document.querySelector('.hero-buttons .btn-primary span');
+
+                if (c.hero.titulo && heroTitle) {
+                    // Keep the accent span, update text before it
+                    const accent = document.getElementById('heroAccent');
+                    if (accent) {
+                        heroTitle.innerHTML = c.hero.titulo.replace(/\n/g, '<br>') +
+                            '<span class="hero-title-accent" id="heroAccent" aria-live="polite">' +
+                            (accent.textContent || 'tecnologia ao resultado') +
+                            '</span>';
+                    }
+                }
+                if (c.hero.subtitulo && heroSubtitle) {
+                    heroSubtitle.textContent = c.hero.subtitulo;
+                }
+                if (c.hero.cta && heroCta) {
+                    heroCta.textContent = c.hero.cta;
+                }
+            }
+
+            // Sobre
+            if (c.sobre) {
+                const aboutTitle = document.getElementById('about-title');
+                const aboutText = document.querySelector('.about-text');
+                const statYears = document.querySelector('.stat-card:nth-child(1) .stat-number');
+                const statProjects = document.querySelector('.stat-card:nth-child(2) .stat-number');
+                const statSatisfaction = document.querySelector('.stat-card:nth-child(3) .stat-number');
+
+                if (c.sobre.titulo && aboutTitle) {
+                    aboutTitle.innerHTML = c.sobre.titulo.replace(/\n/g, '<br>').replace(/<br>/, '<br><span class="text-accent">') + '</span>';
+                }
+                if (c.sobre.texto1 && aboutText) {
+                    aboutText.textContent = c.sobre.texto1;
+                }
+                if (c.sobre.anos && statYears) statYears.textContent = c.sobre.anos;
+                if (c.sobre.projetos && statProjects) statProjects.textContent = c.sobre.projetos;
+                if (c.sobre.satisfacao && statSatisfaction) statSatisfaction.textContent = c.sobre.satisfacao;
+            }
+
+            // Diferenciais
+            if (c.diferenciais && Array.isArray(c.diferenciais)) {
+                const diffCards = document.querySelectorAll('.diff-card');
+                c.diferenciais.forEach((d, i) => {
+                    if (diffCards[i]) {
+                        const titleEl = diffCards[i].querySelector('h3');
+                        const descEl = diffCards[i].querySelector('p');
+                        if (d.titulo && titleEl) titleEl.textContent = d.titulo;
+                        if (d.descricao && descEl) descEl.textContent = d.descricao;
+                    }
+                });
+            }
+
+            // CTA
+            if (c.cta) {
+                const ctaTitle = document.getElementById('cta-title');
+                const ctaSubtitle = document.querySelector('.cta-subtitle');
+
+                if (c.cta.titulo && ctaTitle) {
+                    ctaTitle.innerHTML = c.cta.titulo.replace(/\n/g, '<br>');
+                }
+                if (c.cta.subtitulo && ctaSubtitle) {
+                    ctaSubtitle.textContent = c.cta.subtitulo;
+                }
+            }
+
+            // Config (social links)
+            const configRes = await fetch('/api/config');
+            const configJson = await configRes.json();
+            if (configJson.success && configJson.data) {
+                const cfg = configJson.data;
+                const linkedinLink = document.querySelector('a[aria-label="LinkedIn"]');
+                const githubLink = document.querySelector('a[aria-label="GitHub"]');
+
+                if (cfg.linkedin && linkedinLink) linkedinLink.href = cfg.linkedin;
+                if (cfg.github && githubLink) githubLink.href = cfg.github;
+            }
+        } catch (err) {
+            console.error('Erro ao carregar conteúdo:', err);
+        }
+    }
+
     // --- Initialize All ---
     document.addEventListener('DOMContentLoaded', () => {
         initScrollReveal();
@@ -549,6 +644,7 @@
         initTypingEffect();
         initHoverFeedback();
         loadServices();
+        loadContent();
     });
 
 })();

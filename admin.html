@@ -610,11 +610,29 @@
         <form id="sobreForm">
           <div class="form-group">
             <label for="sobreTitulo">Título da Seção</label>
-            <input type="text" id="sobreTitulo" placeholder="Sobre nós" />
+            <input type="text" id="sobreTitulo" placeholder="Ex: Experiência que gera resultados reais" />
           </div>
           <div class="form-group">
-            <label for="sobreTexto">Texto</label>
-            <textarea id="sobreTexto" placeholder="Texto sobre a empresa" rows="4"></textarea>
+            <label for="sobreTexto1">Texto Principal</label>
+            <textarea id="sobreTexto1" placeholder="Texto principal sobre a empresa" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="sobreTexto2">Texto Secundário</label>
+            <textarea id="sobreTexto2" placeholder="Texto complementar" rows="2"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="sobreAnos">Anos de Experiência</label>
+              <input type="text" id="sobreAnos" placeholder="Ex: 15+" />
+            </div>
+            <div class="form-group">
+              <label for="sobreProjetos">Projetos Entregues</label>
+              <input type="text" id="sobreProjetos" placeholder="Ex: 50+" />
+            </div>
+            <div class="form-group">
+              <label for="sobreSatisfacao">Satisfação</label>
+              <input type="text" id="sobreSatisfacao" placeholder="Ex: 98%" />
+            </div>
           </div>
           <button type="submit" class="btn btn-primary" aria-label="Salvar Sobre">Salvar Sobre</button>
         </form>
@@ -986,7 +1004,11 @@
 
       /* Sobre */
       document.getElementById('sobreTitulo').value = conteudo.sobre?.titulo || '';
-      document.getElementById('sobreTexto').value = conteudo.sobre?.texto || '';
+      document.getElementById('sobreTexto1').value = conteudo.sobre?.texto1 || '';
+      document.getElementById('sobreTexto2').value = conteudo.sobre?.texto2 || '';
+      document.getElementById('sobreAnos').value = conteudo.sobre?.anos || '';
+      document.getElementById('sobreProjetos').value = conteudo.sobre?.projetos || '';
+      document.getElementById('sobreSatisfacao').value = conteudo.sobre?.satisfacao || '';
 
       /* Diferenciais */
       const difContainer = document.getElementById('diferenciaisFields');
@@ -1031,7 +1053,11 @@
       e.preventDefault();
       conteudo.sobre = {
         titulo: document.getElementById('sobreTitulo').value.trim(),
-        texto: document.getElementById('sobreTexto').value.trim()
+        texto1: document.getElementById('sobreTexto1').value.trim(),
+        texto2: document.getElementById('sobreTexto2').value.trim(),
+        anos: document.getElementById('sobreAnos').value.trim(),
+        projetos: document.getElementById('sobreProjetos').value.trim(),
+        satisfacao: document.getElementById('sobreSatisfacao').value.trim()
       };
       await saveConteudo();
       toast('Sobre salvo!', 'success');
