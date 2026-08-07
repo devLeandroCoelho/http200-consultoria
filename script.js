@@ -553,20 +553,9 @@
 
             // Hero
             if (c.hero) {
-                const heroTitle = document.querySelector('.hero-title');
                 const heroSubtitle = document.querySelector('.hero-subtitle');
                 const heroCta = document.querySelector('.hero-buttons .btn-primary span');
 
-                if (c.hero.titulo && heroTitle) {
-                    // Keep the accent span, update text before it
-                    const accent = document.getElementById('heroAccent');
-                    if (accent) {
-                        heroTitle.innerHTML = c.hero.titulo.replace(/\n/g, '<br>') +
-                            '<span class="hero-title-accent" id="heroAccent" aria-live="polite">' +
-                            (accent.textContent || 'tecnologia ao resultado') +
-                            '</span>';
-                    }
-                }
                 if (c.hero.subtitulo && heroSubtitle) {
                     heroSubtitle.textContent = c.hero.subtitulo;
                 }
@@ -577,21 +566,18 @@
 
             // Sobre
             if (c.sobre) {
-                const aboutTitle = document.getElementById('about-title');
-                const aboutText = document.querySelector('.about-text');
-                const statYears = document.querySelector('.stat-card:nth-child(1) .stat-number');
-                const statProjects = document.querySelector('.stat-card:nth-child(2) .stat-number');
-                const statSatisfaction = document.querySelector('.stat-card:nth-child(3) .stat-number');
+                const aboutTexts = document.querySelectorAll('.about-text');
+                const statNumbers = document.querySelectorAll('.stat-card .stat-number');
 
-                if (c.sobre.titulo && aboutTitle) {
-                    aboutTitle.innerHTML = c.sobre.titulo.replace(/\n/g, '<br>').replace(/<br>/, '<br><span class="text-accent">') + '</span>';
+                if (c.sobre.texto1 && aboutTexts[0]) {
+                    aboutTexts[0].textContent = c.sobre.texto1;
                 }
-                if (c.sobre.texto1 && aboutText) {
-                    aboutText.textContent = c.sobre.texto1;
+                if (c.sobre.texto2 && aboutTexts[1]) {
+                    aboutTexts[1].textContent = c.sobre.texto2;
                 }
-                if (c.sobre.anos && statYears) statYears.textContent = c.sobre.anos;
-                if (c.sobre.projetos && statProjects) statProjects.textContent = c.sobre.projetos;
-                if (c.sobre.satisfacao && statSatisfaction) statSatisfaction.textContent = c.sobre.satisfacao;
+                if (c.sobre.anos && statNumbers[0]) statNumbers[0].textContent = c.sobre.anos;
+                if (c.sobre.projetos && statNumbers[1]) statNumbers[1].textContent = c.sobre.projetos;
+                if (c.sobre.satisfacao && statNumbers[2]) statNumbers[2].textContent = c.sobre.satisfacao;
             }
 
             // Diferenciais
@@ -609,12 +595,8 @@
 
             // CTA
             if (c.cta) {
-                const ctaTitle = document.getElementById('cta-title');
                 const ctaSubtitle = document.querySelector('.cta-subtitle');
 
-                if (c.cta.titulo && ctaTitle) {
-                    ctaTitle.innerHTML = c.cta.titulo.replace(/\n/g, '<br>');
-                }
                 if (c.cta.subtitulo && ctaSubtitle) {
                     ctaSubtitle.textContent = c.cta.subtitulo;
                 }
