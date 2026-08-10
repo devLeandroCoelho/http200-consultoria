@@ -1,30 +1,96 @@
-# HTTP200.TI — Consultoria de TI
+<div align="center">
 
-Landing page profissional para a [HTTP200.TI](https://http200.ti), consultoria especializada em tecnologia da informação.
+# HTTP200.TI — IT Consulting Landing Page
 
-## Sobre
+[![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-222222?style=for-the-badge&logo=github-pages&logoColor=white)](https://pages.github.com/)
 
-Site estático (HTML, CSS, JavaScript puro) com design responsivo para todos os dispositivos.
+![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge)
+![License](https://img.shields.io/badge/License-Proprietary-gray?style=for-the-badge)
 
-## Stack
+</div>
 
-- HTML5 semântico
-- CSS3 com design system customizado
-- JavaScript vanilla (sem dependências externas)
+---
 
-## Deploy
+Professional landing page for [HTTP200.TI](https://http200.ti) — an IT consulting firm specializing in **DevOps, Backend, AI, and Digital Transformation**.
 
-O site é hospedado via **GitHub Pages**.
+## Features
 
-🔗 **[Acesse o site](https://devleandrocoelho.github.io/http200-consultoria)**
+- Fully responsive design for all devices (mobile, tablet, desktop)
+- Semantic HTML5 with custom CSS design system
+- Vanilla JavaScript — zero external dependencies
+- Fast loading with static deployment
+- Admin panel for content management
 
-## Como rodar localmente
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Markup | HTML5 (semantic) |
+| Styling | CSS3 (custom design system) |
+| Interactivity | Vanilla JavaScript |
+| Hosting | GitHub Pages |
+
+## Quick Start
 
 ```bash
-# Basta abrir o index.html no navegador
+# Clone the repository
+git clone https://github.com/devLeandroCoelho/http200-consultoria.git
+cd http200-consultoria
+
+# Open in browser
 open index.html
 ```
 
-## Licença
+## Deployment
 
-Proprietário — HTTP200.TI
+The site is deployed via **GitHub Pages**.
+
+Live site: **[http200.ti](https://devleandrocoelho.github.io/http200-consultoria)**
+
+## License
+
+Proprietary — HTTP200.TI
+
+---
+
+<div align="center">
+
+## 🇧🇷 Português
+
+# HTTP200.TI — Landing Page de Consultoria de TI
+
+Landing page profissional para a [HTTP200.TI](https://http200.ti), consultoria especializada em **DevOps, Backend, IA e Transformação Digital**.
+
+### Funcionalidades
+
+- Design responsivo para todos os dispositivos (mobile, tablet, desktop)
+- HTML5 semântico com design system customizado em CSS3
+- JavaScript vanilla — zero dependências externas
+- Carregamento rápido com deploy estático
+- Painel administrativo para gerenciamento de conteúdo
+
+### Stack
+
+| Camada | Tecnologia |
+|--------|------------|
+| Markup | HTML5 (semântico) |
+| Estilos | CSS3 (design system customizado) |
+| Interatividade | JavaScript vanilla |
+| Hospedagem | GitHub Pages |
+
+### Como rodar
+
+```bash
+git clone https://github.com/devLeandroCoelho/http200-consultoria.git
+cd http200-consultoria
+open index.html
+```
+
+**Site ao vivo:** [http200.ti](https://devleandrocoelho.github.io/http200-consultoria)
+
+**Licença:** Proprietária — HTTP200.TI
+
+</div>
