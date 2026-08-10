@@ -12,7 +12,52 @@
 
 </div>
 
+<p align="center">
+  <a href="#português">Português</a> | <a href="#english">English</a>
+</p>
+
 ---
+
+# <a id="português"></a>Português
+
+# HTTP200.TI — Landing Page de Consultoria de TI
+
+Landing page profissional para a [HTTP200.TI](https://http200.ti), consultoria especializada em **DevOps, Backend, IA e Transformação Digital**.
+
+### Funcionalidades
+
+- Design responsivo para todos os dispositivos (mobile, tablet, desktop)
+- HTML5 semântico com design system customizado em CSS3
+- JavaScript vanilla — zero dependências externas
+- Carregamento rápido com deploy estático
+- Painel administrativo para gerenciamento de conteúdo
+
+### Stack
+
+| Camada | Tecnologia |
+|--------|------------|
+| Markup | HTML5 (semântico) |
+| Estilos | CSS3 (design system customizado) |
+| Interatividade | JavaScript vanilla |
+| Hospedagem | GitHub Pages |
+
+### Como rodar
+
+```bash
+git clone https://github.com/devLeandroCoelho/http200-consultoria.git
+cd http200-consultoria
+open index.html
+```
+
+**Site ao vivo:** [http200.ti](https://devleandrocoelho.github.io/http200-consultoria)
+
+**Licença:** Proprietária — HTTP200.TI
+
+</div>
+
+---
+
+# <a id="english"></a>English
 
 Professional landing page for [HTTP200.TI](https://http200.ti) — an IT consulting firm specializing in **DevOps, Backend, AI, and Digital Transformation**.
 
@@ -57,40 +102,3 @@ Proprietary — HTTP200.TI
 ---
 
 <div align="center">
-
-## 🇧🇷 Português
-
-# HTTP200.TI — Landing Page de Consultoria de TI
-
-Landing page profissional para a [HTTP200.TI](https://http200.ti), consultoria especializada em **DevOps, Backend, IA e Transformação Digital**.
-
-### Funcionalidades
-
-- Design responsivo para todos os dispositivos (mobile, tablet, desktop)
-- HTML5 semântico com design system customizado em CSS3
-- JavaScript vanilla — zero dependências externas
-- Carregamento rápido com deploy estático
-- Painel administrativo para gerenciamento de conteúdo
-
-### Stack
-
-| Camada | Tecnologia |
-|--------|------------|
-| Markup | HTML5 (semântico) |
-| Estilos | CSS3 (design system customizado) |
-| Interatividade | JavaScript vanilla |
-| Hospedagem | GitHub Pages |
-
-### Como rodar
-
-```bash
-git clone https://github.com/devLeandroCoelho/http200-consultoria.git
-cd http200-consultoria
-open index.html
-```
-
-**Site ao vivo:** [http200.ti](https://devleandrocoelho.github.io/http200-consultoria)
-
-**Licença:** Proprietária — HTTP200.TI
-
-</div>
