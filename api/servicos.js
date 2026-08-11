@@ -15,18 +15,23 @@
 
 import { createClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
+import { corsHeaders, handleOptions } from './_lib/cors.js';
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
-const JWT_SECRET = process.env.JWT_SECRET || 'http200ti-fallback-secret';
+
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error(
+    '[http200-consultoria] JWT_SECRET não definido. Configure a env var JWT_SECRET ' +
+    '(Vercel: Settings → Environment Variables) e faça redeploy. ' +
+    'A API recusou iniciar por segurança — sem fallback hardcoded.'
+  );
+}
 
 const supabase = createClient(supabaseUrl || '', supabaseKey || '');
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+const ENDPOINT_METHODS = 'GET, POST, PUT, DELETE, OPTIONS';
 
 function verifyToken(req) {
   const auth = req.headers.get('authorization');
@@ -36,7 +41,7 @@ function verifyToken(req) {
 }
 
 /** GET — Lista serviços ativos */
-export async function GET() {
+export async function GET(req) {
   const { data, error } = await supabase
     .from('servicos')
     .select('*')
@@ -47,13 +52,13 @@ export async function GET() {
     console.error('Erro ao buscar serviços:', error);
     return new Response(
       JSON.stringify({ success: false, error: 'Erro ao buscar serviços' }),
-      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
 
   return new Response(
     JSON.stringify({ success: true, data: data || [] }),
-    { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+    { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
   );
 }
 
@@ -63,7 +68,7 @@ export async function POST(req) {
   if (!user) {
     return new Response(
       JSON.stringify({ success: false, error: 'Não autorizado' }),
-      { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
 
@@ -74,7 +79,7 @@ export async function POST(req) {
     if (!titulo || !descricao) {
       return new Response(
         JSON.stringify({ success: false, error: 'Título e descrição são obrigatórios' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
 
@@ -94,19 +99,19 @@ export async function POST(req) {
       console.error('Erro ao criar serviço:', error);
       return new Response(
         JSON.stringify({ success: false, error: 'Erro ao criar serviço' }),
-        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
 
     return new Response(
       JSON.stringify({ success: true, data }),
-      { status: 201, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 201, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   } catch (error) {
     console.error('Erro ao criar serviço:', error);
     return new Response(
       JSON.stringify({ success: false, error: 'Erro ao criar serviço' }),
-      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
 }
@@ -117,7 +122,7 @@ export async function PUT(req) {
   if (!user) {
     return new Response(
       JSON.stringify({ success: false, error: 'Não autorizado' }),
-      { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
 
@@ -128,7 +133,7 @@ export async function PUT(req) {
     if (!id) {
       return new Response(
         JSON.stringify({ success: false, error: 'ID é obrigatório' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
 
@@ -150,19 +155,19 @@ export async function PUT(req) {
       console.error('Erro ao atualizar serviço:', error);
       return new Response(
         JSON.stringify({ success: false, error: 'Serviço não encontrado' }),
-        { status: 404, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 404, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
 
     return new Response(
       JSON.stringify({ success: true, data }),
-      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   } catch (error) {
     console.error('Erro ao atualizar serviço:', error);
     return new Response(
       JSON.stringify({ success: false, error: 'Erro ao atualizar serviço' }),
-      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
 }
@@ -173,7 +178,7 @@ export async function DELETE(req) {
   if (!user) {
     return new Response(
       JSON.stringify({ success: false, error: 'Não autorizado' }),
-      { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
 
@@ -184,7 +189,7 @@ export async function DELETE(req) {
     if (!id) {
       return new Response(
         JSON.stringify({ success: false, error: 'ID é obrigatório' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
 
@@ -197,25 +202,25 @@ export async function DELETE(req) {
       console.error('Erro ao remover serviço:', error);
       return new Response(
         JSON.stringify({ success: false, error: 'Erro ao remover serviço' }),
-        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
 
     return new Response(
       JSON.stringify({ success: true, message: 'Serviço removido com sucesso' }),
-      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   } catch (error) {
     console.error('Erro ao remover serviço:', error);
     return new Response(
       JSON.stringify({ success: false, error: 'Erro ao remover serviço' }),
-      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
 }
 
-export async function OPTIONS() {
-  return new Response(null, { status: 204, headers: corsHeaders });
+export async function OPTIONS(req) {
+  return handleOptions(req, ENDPOINT_METHODS);
 }
 
 export const config = { runtime: 'nodejs' };

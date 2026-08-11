@@ -13,18 +13,23 @@
 
 import { createClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
+import { corsHeaders, handleOptions } from './_lib/cors.js';
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
-const JWT_SECRET = process.env.JWT_SECRET || 'http200ti-fallback-secret';
+
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error(
+    '[http200-consultoria] JWT_SECRET não definido. Configure a env var JWT_SECRET ' +
+    '(Vercel: Settings → Environment Variables) e faça redeploy. ' +
+    'A API recusou iniciar por segurança — sem fallback hardcoded.'
+  );
+}
 
 const supabase = createClient(supabaseUrl || '', supabaseKey || '');
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+const ENDPOINT_METHODS = 'GET, PUT, OPTIONS';
 
 /** Configurações padrão */
 const DEFAULT_CONFIG = {
@@ -41,7 +46,7 @@ function verifyToken(req) {
 }
 
 /** GET — Retorna configurações */
-export async function GET() {
+export async function GET(req) {
   const { data, error } = await supabase
     .from('config')
     .select('chave, valor');
@@ -49,7 +54,7 @@ export async function GET() {
   if (error || !data || data.length === 0) {
     return new Response(
       JSON.stringify({ success: true, data: DEFAULT_CONFIG }),
-      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
 
@@ -60,7 +65,7 @@ export async function GET() {
 
   return new Response(
     JSON.stringify({ success: true, data: config }),
-    { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+    { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
   );
 }
 
@@ -70,7 +75,7 @@ export async function PUT(req) {
   if (!user) {
     return new Response(
       JSON.stringify({ success: false, error: 'Não autorizado' }),
-      { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
 
@@ -91,7 +96,7 @@ export async function PUT(req) {
         console.error(`Erro ao atualizar config ${key}:`, error);
         return new Response(
           JSON.stringify({ success: false, error: `Erro ao atualizar ${key}` }),
-          { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+          { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
         );
       }
 
@@ -100,19 +105,19 @@ export async function PUT(req) {
 
     return new Response(
       JSON.stringify({ success: true, data: updates }),
-      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   } catch (error) {
     console.error('Erro ao atualizar config:', error);
     return new Response(
       JSON.stringify({ success: false, error: 'Erro ao atualizar configurações' }),
-      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
 }
 
-export async function OPTIONS() {
-  return new Response(null, { status: 204, headers: corsHeaders });
+export async function OPTIONS(req) {
+  return handleOptions(req, ENDPOINT_METHODS);
 }
 
 export const config = { runtime: 'nodejs' };

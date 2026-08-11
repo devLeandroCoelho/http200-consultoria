@@ -12,14 +12,18 @@
  */
 
 import jwt from 'jsonwebtoken';
+import { corsHeaders, handleOptions } from './_lib/cors.js';
 
-const SECRET = process.env.JWT_SECRET || 'http200ti-fallback-secret';
+const AUTH_METHODS = 'GET, POST, OPTIONS';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+const SECRET = process.env.JWT_SECRET;
+if (!SECRET) {
+  throw new Error(
+    '[http200-consultoria] JWT_SECRET não definido. Configure a env var JWT_SECRET ' +
+    '(Vercel: Settings → Environment Variables) e faça redeploy. ' +
+    'A API recusou iniciar por segurança — sem fallback hardcoded.'
+  );
+}
 
 /**
  * Verifica se um token JWT é válido
@@ -39,16 +43,12 @@ function verifyToken(req) {
 
 /** GET — Verificar token existente */
 export async function GET(req) {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: corsHeaders });
-  }
-
   try {
     const decoded = verifyToken(req);
     if (!decoded) {
       return new Response(
         JSON.stringify({ success: false, valid: false, error: 'Token inválido ou expirado' }),
-        { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, AUTH_METHODS) } }
       );
     }
     return new Response(
@@ -57,12 +57,12 @@ export async function GET(req) {
         valid: true,
         data: { user: decoded.user, role: decoded.role, exp: decoded.exp },
       }),
-      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, AUTH_METHODS) } }
     );
   } catch (error) {
     return new Response(
       JSON.stringify({ success: false, valid: false, error: 'Erro interno' }),
-      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, AUTH_METHODS) } }
     );
   }
 }
@@ -76,7 +76,7 @@ export async function POST(req) {
     if (!usuario || !senha) {
       return new Response(
         JSON.stringify({ success: false, error: 'Usuário e senha são obrigatórios' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, AUTH_METHODS) } }
       );
     }
 
@@ -89,14 +89,14 @@ export async function POST(req) {
       console.error('ADMIN_USER ou ADMIN_PASS não configurados');
       return new Response(
         JSON.stringify({ success: false, error: 'Erro de configuração do servidor' }),
-        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, AUTH_METHODS) } }
       );
     }
 
     if (userSanitized !== validUser || passSanitized !== validPass) {
       return new Response(
         JSON.stringify({ success: false, error: 'Credenciais inválidas' }),
-        { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, AUTH_METHODS) } }
       );
     }
 
@@ -111,19 +111,19 @@ export async function POST(req) {
         success: true,
         data: { token, user: userSanitized, expiresIn: '24h' },
       }),
-      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, AUTH_METHODS) } }
     );
   } catch (error) {
     console.error('Erro no login:', error);
     return new Response(
       JSON.stringify({ success: false, error: 'Erro interno do servidor' }),
-      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, AUTH_METHODS) } }
     );
   }
 }
 
-export async function OPTIONS() {
-  return new Response(null, { status: 204, headers: corsHeaders });
+export async function OPTIONS(req) {
+  return handleOptions(req, AUTH_METHODS);
 }
 
 export const config = { runtime: 'nodejs' };
