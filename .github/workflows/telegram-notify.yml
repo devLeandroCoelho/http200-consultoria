@@ -1,0 +1,56 @@
+name: Telegram Notify
+
+on:
+  issues:
+    types: [opened, closed, reopened, labeled]
+  pull_request:
+    types: [opened, closed, ready_for_review, review_requested]
+  push:
+    branches: [main, master]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send notification to Telegram
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_ACTION: ${{ github.event.action }}
+          REPO_SHORT: ${{ github.event.repository.name }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${TELEGRAM_TOKEN:-}" ] || [ -z "${TELEGRAM_CHAT_ID:-}" ]; then
+            echo "::warning::Secrets TELEGRAM_TOKEN/TELEGRAM_CHAT_ID nao configurados - pulando notificacao."
+            exit 0
+          fi
+
+          # Monta o payload JSON a partir do evento real ($GITHUB_EVENT_PATH) - sem risco de injecao
+          python3 - "$GITHUB_EVENT_PATH" "$GITHUB_EVENT_NAME" "$GITHUB_EVENT_ACTION" "$REPO_SHORT" > /tmp/telegram-payload.json <<'PYEOF'
+import json, os, sys
+
+event_path, event_name, action, repo = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+with open(event_path, encoding="utf-8") as f:
+    ev = json.load(f)
+
+if event_name == "issues":
+    issue = ev.get("issue") or {}
+    text = f"📝 Issue #{issue.get('number', '?')} {action}: {issue.get('title', '')} - {repo}"
+elif event_name == "pull_request":
+    pr = ev.get("pull_request") or {}
+    text = f"🔀 PR #{pr.get('number', '?')} {action}: {pr.get('title', '')} - {repo}"
+else:
+    commit = ev.get("head_commit") or {}
+    msg = (commit.get("message") or "").splitlines()[0][:80]
+    sha = (ev.get("after") or "")[:7]
+    text = f"🚀 Deploy {repo}: {msg} ({sha})"
+
+payload = {"chat_id": os.environ["TELEGRAM_CHAT_ID"], "text": text[:1024]}
+print(json.dumps(payload, ensure_ascii=False))
+PYEOF
+
+          curl -sS -f -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            --data-binary @/tmp/telegram-payload.json
