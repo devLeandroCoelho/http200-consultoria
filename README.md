@@ -101,4 +101,27 @@ Proprietary — HTTP200.TI
 
 ---
 
+# <a id="environment"></a>Variáveis de Ambiente / Environment Variables
+
+> Configuração de backend (endpoints em `api/`). Copie `.env.example` para `.env.local` em dev e configure as mesmas variáveis na Vercel (**Settings → Environment Variables**). **Nunca commite valores reais** — `.gitignore` já cobre `.env*`.
+
+| Variável | Obrigatória | Descrição |
+|----------|-------------|-----------|
+| `JWT_SECRET` | ✅ | Segredo para assinar/verificar tokens JWT. **Sem fallback** — se ausente, a API falha ao iniciar por segurança. Gere com `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
+| `ADMIN_USER` / `ADMIN_PASS` | ✅ | Credenciais do painel admin |
+| `SUPABASE_URL` / `SUPABASE_ANON_KEY` | ✅ | Conexão com o Supabase |
+| `CORS_ALLOWED_ORIGINS` | ❌ | Origens CORS extras (vírgula-separadas), somam-se à allowlist padrão |
+
+## CORS (origens permitidas)
+
+A API **nunca** responde com `Access-Control-Allow-Origin: *`. A allowlist padrão:
+
+- `https://devleandrocoelho.github.io` — produção (GitHub Pages)
+- `https://http200-consultoria.vercel.app` — produção (Vercel)
+- `http://localhost:*` / `http://127.0.0.1:*` — desenvolvimento local
+
+Se o domínio de produção na Vercel for customizado, adicione-o em `CORS_ALLOWED_ORIGINS`.
+
+---
+
 <div align="center">
