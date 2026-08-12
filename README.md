@@ -1,14 +1,8 @@
 <div align="center">
 
-# HTTP200.TI — IT Consulting Landing Page
-
-[![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
-[![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
-[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-222222?style=for-the-badge&logo=github-pages&logoColor=white)](https://pages.github.com/)
-
-![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge)
-![License](https://img.shields.io/badge/License-Proprietary-gray?style=for-the-badge)
+![License: MIT](https://img.shields.io/github/license/devLeandroCoelho/http200-consultoria)
+![Deploy](https://img.shields.io/github/actions/workflow/status/devLeandroCoelho/http200-consultoria/deploy.yml?label=deploy&logo=github)
+![Site](https://img.shields.io/website?url=https%3A%2F%2Fdevleandrocoelho.github.io%2Fhttp200-consultoria&label=site&logo=githubpages)
 
 </div>
 
@@ -39,7 +33,7 @@ Landing page profissional para a [HTTP200.TI](https://http200.ti), consultoria e
 | Markup | HTML5 (semântico) |
 | Estilos | CSS3 (design system customizado) |
 | Interatividade | JavaScript vanilla |
-| Hospedagem | GitHub Pages |
+| Hospedagem | GitHub Pages + Vercel (API serverless) |
 
 ### Como rodar
 
@@ -49,11 +43,15 @@ cd http200-consultoria
 open index.html
 ```
 
-**Site ao vivo:** [http200.ti](https://devleandrocoelho.github.io/http200-consultoria)
+> Para rodar a API localmente, veja o [CONTRIBUTING.md](CONTRIBUTING.md#como-rodar-localmente).
 
-**Licença:** Proprietária — HTTP200.TI
+## Contribuindo
 
-</div>
+Quer ajudar? Leia o [CONTRIBUTING.md](CONTRIBUTING.md) — guia rápido com como rodar o projeto, padrões de código e como abrir issues e pull requests.
+
+## Licença
+
+Distribuído sob **MIT License** — veja o arquivo [LICENSE](LICENSE).
 
 ---
 
@@ -76,7 +74,7 @@ Professional landing page for [HTTP200.TI](https://http200.ti) — an IT consult
 | Markup | HTML5 (semantic) |
 | Styling | CSS3 (custom design system) |
 | Interactivity | Vanilla JavaScript |
-| Hosting | GitHub Pages |
+| Hosting | GitHub Pages + Vercel (serverless API) |
 
 ## Quick Start
 
@@ -91,13 +89,17 @@ open index.html
 
 ## Deployment
 
-The site is deployed via **GitHub Pages**.
+The site is deployed via **GitHub Pages** and the API runs on **Vercel** (serverless functions in `api/`).
 
 Live site: **[http200.ti](https://devleandrocoelho.github.io/http200-consultoria)**
 
+## Contributing
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to run the project, code standards, and how to open issues and pull requests.
+
 ## License
 
-Proprietary — HTTP200.TI
+Distributed under **MIT License** — see [LICENSE](LICENSE).
 
 ---
 
@@ -122,6 +124,8 @@ A API **nunca** responde com `Access-Control-Allow-Origin: *`. A allowlist padr�
 
 Se o domínio de produção na Vercel for customizado, adicione-o em `CORS_ALLOWED_ORIGINS`.
 
----
-
 <div align="center">
+
+Made with ❤️ by [Leandro Coelho](https://github.com/devLeandroCoelho)
+
+</div>
