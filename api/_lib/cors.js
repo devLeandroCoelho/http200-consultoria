@@ -5,19 +5,21 @@
  * resposta SOMENTE se ela estiver na lista. Nunca retorna '*' em produção.
  * 
  * Origens permitidas por padrão:
- *   - https://devleandrocoelho.github.io            (produção — GitHub Pages)
+ *   - https://devleandrocoelho.github.io          (produção — GitHub Pages)
+ *   - https://http200-consultoria.vercel.app      (produção — Vercel, domínio padrão do projeto)
  *   - http://localhost:PORT / http://127.0.0.1:PORT  (desenvolvimento local)
  * 
- * Origens adicionais podem ser configuradas via env var CORS_ALLOWED_ORIGINS
- * (separadas por vírgula) — útil para domínios de preview:
- *   CORS_ALLOWED_ORIGINS="https://preview.example.com,https://staging.example.com"
+ * Se o domínio de produção na Vercel for customizado, adicione-o via env var
+ * CORS_ALLOWED_ORIGINS (separadas por vírgula) — também útil para previews:
+ *   CORS_ALLOWED_ORIGINS="https://staging.example.com,https://preview.example.com"
  * 
  * Autor: Leandro Coelho — http200.ti@gmail.com
  */
 
-/** Origem de produção (GitHub Pages) */
+/** Origens de produção (GitHub Pages + Vercel) */
 const DEFAULT_ALLOWED_ORIGINS = [
   'https://devleandrocoelho.github.io',
+  'https://http200-consultoria.vercel.app',
 ];
 
 /** Origens extras via env (opcional): "https://a.com,https://b.com" */
