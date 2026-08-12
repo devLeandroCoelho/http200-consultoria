@@ -10,14 +10,18 @@
  */
 
 import jwt from 'jsonwebtoken';
+import { corsHeaders, handleOptions } from './_lib/cors.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'http200ti-fallback-secret';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error(
+    '[http200-consultoria] JWT_SECRET não definido. Configure a env var JWT_SECRET ' +
+    '(Vercel: Settings → Environment Variables) e faça redeploy. ' +
+    'A API recusou iniciar por segurança — sem fallback hardcoded.'
+  );
+}
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+const ENDPOINT_METHODS = 'POST, OPTIONS';
 
 const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.svg'];
 const MAX_SIZE_BYTES = 2 * 1024 * 1024;
@@ -40,7 +44,7 @@ export async function POST(req) {
   if (!user) {
     return new Response(
       JSON.stringify({ success: false, error: 'Não autorizado' }),
-      { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
 
@@ -51,14 +55,14 @@ export async function POST(req) {
     if (!filename || !data) {
       return new Response(
         JSON.stringify({ success: false, error: 'Nome e dados são obrigatórios' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
 
     if (!isValidFileType(filename)) {
       return new Response(
         JSON.stringify({ success: false, error: `Tipo não permitido. Aceitos: ${ALLOWED_EXTENSIONS.join(', ')}` }),
-        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
 
@@ -67,25 +71,25 @@ export async function POST(req) {
     if (sizeInBytes > MAX_SIZE_BYTES) {
       return new Response(
         JSON.stringify({ success: false, error: 'Arquivo muito grande. Máximo: 2MB' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
 
     return new Response(
       JSON.stringify({ success: true, data: { url: data, filename } }),
-      { status: 201, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 201, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   } catch (error) {
     console.error('Erro no upload:', error);
     return new Response(
       JSON.stringify({ success: false, error: 'Erro ao processar upload' }),
-      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
 }
 
-export async function OPTIONS() {
-  return new Response(null, { status: 204, headers: corsHeaders });
+export async function OPTIONS(req) {
+  return handleOptions(req, ENDPOINT_METHODS);
 }
 
 export const config = { runtime: 'nodejs' };

@@ -7,11 +7,9 @@
  * Versão: 1.0.0
  */
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+import { corsHeaders, handleOptions } from './_lib/cors.js';
+
+const ENDPOINT_METHODS = 'GET, OPTIONS';
 
 /** Documentação da API */
 const API_DOCS = {
@@ -34,15 +32,15 @@ const API_DOCS = {
   contact: 'http200.ti@gmail.com',
 };
 
-export async function GET() {
+export async function GET(req) {
   return new Response(
     JSON.stringify(API_DOCS),
-    { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+    { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
   );
 }
 
-export async function OPTIONS() {
-  return new Response(null, { status: 204, headers: corsHeaders });
+export async function OPTIONS(req) {
+  return handleOptions(req, ENDPOINT_METHODS);
 }
 
 export const config = { runtime: 'nodejs' };
