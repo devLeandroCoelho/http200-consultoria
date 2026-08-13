@@ -45,6 +45,19 @@ open index.html
 
 > Para rodar a API localmente, veja o [CONTRIBUTING.md](CONTRIBUTING.md#como-rodar-localmente).
 
+### Testes
+
+A API (`api/`) tem suíte de testes com **Vitest** — cobre auth, conteúdo, upload, serviços e configurações, com o Supabase 100% mockado (nenhuma chamada real de rede nem credenciais de produção).
+
+```bash
+npm install          # instala dependências (inclui vitest)
+npx vitest run       # roda a suíte de testes (uma vez)
+npx vitest           # modo watch (re-roda a cada mudança)
+node --check api/*.js   # valida sintaxe dos handlers (opcional)
+```
+
+> Os testes usam apenas valores fake definidos em `tests/setup.js` — nunca leem `.env.local` nem chamam o Supabase de produção.
+
 ## Contribuindo
 
 Quer ajudar? Leia o [CONTRIBUTING.md](CONTRIBUTING.md) — guia rápido com como rodar o projeto, padrões de código e como abrir issues e pull requests.
@@ -86,6 +99,18 @@ cd http200-consultoria
 # Open in browser
 open index.html
 ```
+
+## Tests
+
+The API (`api/`) has a **Vitest** test suite covering auth, content, upload, services and config — Supabase is fully mocked (no real network calls or production credentials).
+
+```bash
+npm install        # installs dependencies (includes vitest)
+npx vitest run     # runs the test suite once
+npx vitest         # watch mode (re-runs on change)
+```
+
+> Tests only use fake values from `tests/setup.js` — they never read `.env.local` nor call the production Supabase.
 
 ## Deployment
 
