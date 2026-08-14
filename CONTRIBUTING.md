@@ -32,9 +32,9 @@ As funções em `api/` rodam no runtime Node.js da **Vercel** e dependem do Supa
 
    | Variável            | Descrição                          |
    | ------------------- | ---------------------------------- |
-   | `SUPABASE_URL`      | URL do projeto Supabase            |
-   | `SUPABASE_ANON_KEY` | Chave pública (anon) do Supabase   |
-   | `JWT_SECRET`        | Segredo para assinar o JWT do login |
+   | `SUPABASE_URL`               | URL do projeto Supabase                          |
+   | `SUPABASE_SERVICE_ROLE_KEY`  | Service-role key (SECRETA) — usada pela API; as policies RLS de escrita exigem `auth.role() = 'service_role'` |
+   | `JWT_SECRET`                 | Segredo para assinar o JWT do login              |
 
 3. Suba o ambiente local da Vercel:
    ```bash

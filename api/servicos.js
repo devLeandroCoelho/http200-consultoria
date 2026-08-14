@@ -13,12 +13,9 @@
  * Versão: 1.0.0
  */
 
-import { createClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
 import { corsHeaders, handleOptions } from './_lib/cors.js';
-
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
+import { supabase } from './_lib/supabase.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
@@ -28,8 +25,6 @@ if (!JWT_SECRET) {
     'A API recusou iniciar por segurança — sem fallback hardcoded.'
   );
 }
-
-const supabase = createClient(supabaseUrl || '', supabaseKey || '');
 
 const ENDPOINT_METHODS = 'GET, POST, PUT, DELETE, OPTIONS';
 

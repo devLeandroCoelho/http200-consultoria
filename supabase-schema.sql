@@ -85,24 +85,35 @@ CREATE POLICY "Conteúdo é público para leitura" ON conteudo
 CREATE POLICY "Config é público para leitura" ON config
   FOR SELECT USING (true);
 
--- Políticas de escrita (apenas service_role — backend)
+-- ============================================
+-- RLS — ESCRITA (fail-closed: apenas service_role)
+-- ============================================
+-- Racional de segurança (auditoria 13/08 — MAJOR fechado nesta mudança):
+-- Antes, estas policies usavam USING (true)/WITH CHECK (true) e a API usava
+-- a anon key (pública). Qualquer um que obtivesse a anon key podia escrever
+-- direto no PostgREST, contornando o verifyToken da API serverless.
+-- Agora a escrita exige auth.role() = 'service_role': o Supabase só atribui
+-- esse papel à service-role key (secreta), usada pela API (api/_lib/supabase.js).
+-- A anon key perde todo poder de escrita — fail-closed.
+-- A leitura pública (SELECT acima) permanece apenas onde a landing precisa.
+
 CREATE POLICY "Backend pode inserir serviços" ON servicos
-  FOR INSERT WITH CHECK (true);
+  FOR INSERT WITH CHECK (auth.role() = 'service_role');
 
 CREATE POLICY "Backend pode atualizar serviços" ON servicos
-  FOR UPDATE USING (true);
+  FOR UPDATE USING (auth.role() = 'service_role');
 
 CREATE POLICY "Backend pode deletar serviços" ON servicos
-  FOR DELETE USING (true);
+  FOR DELETE USING (auth.role() = 'service_role');
 
 CREATE POLICY "Backend pode inserir conteúdo" ON conteudo
-  FOR INSERT WITH CHECK (true);
+  FOR INSERT WITH CHECK (auth.role() = 'service_role');
 
 CREATE POLICY "Backend pode atualizar conteúdo" ON conteudo
-  FOR UPDATE USING (true);
+  FOR UPDATE USING (auth.role() = 'service_role');
 
 CREATE POLICY "Backend pode inserir config" ON config
-  FOR INSERT WITH CHECK (true);
+  FOR INSERT WITH CHECK (auth.role() = 'service_role');
 
 CREATE POLICY "Backend pode atualizar config" ON config
-  FOR UPDATE USING (true);
+  FOR UPDATE USING (auth.role() = 'service_role');

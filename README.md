@@ -136,7 +136,7 @@ Distributed under **MIT License** — see [LICENSE](LICENSE).
 |----------|-------------|-----------|
 | `JWT_SECRET` | ✅ | Segredo para assinar/verificar tokens JWT. **Sem fallback** — se ausente, a API falha ao iniciar por segurança. Gere com `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
 | `ADMIN_USER` / `ADMIN_PASS` | ✅ | Credenciais do painel admin |
-| `SUPABASE_URL` / `SUPABASE_ANON_KEY` | ✅ | Conexão com o Supabase |
+| `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | ✅ | Conexão com o Supabase — **service-role key (secreta)**; a anon key foi removida, pois as policies RLS de escrita exigem `auth.role() = 'service_role'` |
 | `CORS_ALLOWED_ORIGINS` | ❌ | Origens CORS extras (vírgula-separadas), somam-se à allowlist padrão |
 
 ## CORS (origens permitidas)

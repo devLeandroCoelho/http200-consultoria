@@ -13,4 +13,4 @@ process.env.JWT_SECRET = 'chave-de-teste-fake-issue-4';
 process.env.ADMIN_USER = 'admin-teste';
 process.env.ADMIN_PASS = 'senha-teste-123';
 process.env.SUPABASE_URL = 'https://supabase-mock.invalid';
-process.env.SUPABASE_ANON_KEY = 'anon-key-fake-de-teste';
+process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key-fake-de-teste';
