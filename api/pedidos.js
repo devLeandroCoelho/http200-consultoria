@@ -1,16 +1,19 @@
 /**
- * HTTP200.TI Consultoria — Serviços
- * 
- * CRUD completo para gerenciamento de serviços.
- * 
+ * HTTP200.TI Consultoria — Pedidos (Template Shop)
+ *
+ * CRUD para gerenciamento de pedidos de templates.
+ * Qualquer pessoa pode criar um pedido (público).
+ * Apenas admin pode listar/atualizar status/excluir.
+ *
  * Rotas:
- *   GET    /api/servicos    — Lista serviços (público)
- *   POST   /api/servicos    — Cria serviço (auth)
- *   PUT    /api/servicos    — Atualiza serviço (auth)
- *   DELETE /api/servicos?id — Remove serviço (auth)
- * 
+ *   GET    /api/pedidos    — Lista pedidos (auth)
+ *   POST   /api/pedidos    — Cria pedido (público)
+ *   PUT    /api/pedidos    — Atualiza pedido (auth)
+ *   DELETE /api/pedidos?id — Remove pedido (auth)
+ *
  * Autor: Leandro Coelho — http200.ti@gmail.com
  * Versão: 1.0.0
+ * Issue: #17
  */
 
 import jwt from 'jsonwebtoken';
@@ -35,30 +38,14 @@ function verifyToken(req) {
   try { return jwt.verify(token, JWT_SECRET); } catch { return null; }
 }
 
-/** GET — Lista serviços ativos */
-export async function GET(req) {
-  const { data, error } = await supabasePublic
-    .from('servicos')
-    .select('*')
-    .eq('ativo', true)
-    .order('ordem', { ascending: true });
-
-  if (error) {
-    console.error('Erro ao buscar serviços:', error);
-    return new Response(
-      JSON.stringify({ success: false, error: 'Erro ao buscar serviços' }),
-      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
-    );
-  }
-
-  return new Response(
-    JSON.stringify({ success: true, data: data || [] }),
-    { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
-  );
+function formatPreco(value) {
+  const num = Number(value);
+  if (isNaN(num)) return 0;
+  return Math.round(num * 100) / 100;
 }
 
-/** POST — Cria serviço (autenticado) */
-export async function POST(req) {
+/** GET — Lista pedidos (autenticado) */
+export async function GET(req) {
   const user = verifyToken(req);
   if (!user) {
     return new Response(
@@ -68,32 +55,64 @@ export async function POST(req) {
   }
 
   try {
-    const body = await req.json();
-    const { titulo, descricao, icon, ordem } = body;
+    const { data, error } = await supabaseAdmin
+      .from('pedidos')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-    if (!titulo || !descricao) {
+    if (error) {
+      console.error('Erro ao buscar pedidos:', error);
       return new Response(
-        JSON.stringify({ success: false, error: 'Título e descrição são obrigatórios' }),
+        JSON.stringify({ success: false, error: 'Erro ao buscar pedidos' }),
+        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({ success: true, data: data || [] }),
+      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
+    );
+  } catch (error) {
+    console.error('Erro ao buscar pedidos:', error);
+    return new Response(
+      JSON.stringify({ success: false, error: 'Erro ao buscar pedidos' }),
+      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
+    );
+  }
+}
+
+/** POST — Cria pedido (público) */
+export async function POST(req) {
+  try {
+    const body = await req.json();
+    const { nome_cliente, email_cliente, whatsapp, produto_id, produto_nome, produto_preco, observacoes } = body;
+
+    if (!nome_cliente || !email_cliente || !produto_id || !produto_nome || produto_preco === undefined) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Nome, email, produto e preço são obrigatórios' }),
         { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
 
-    const { data, error } = await supabaseAdmin
-      .from('servicos')
+    const { data, error } = await supabasePublic
+      .from('pedidos')
       .insert({
-        titulo: String(titulo).trim(),
-        descricao: String(descricao).trim(),
-        icon: String(icon || 'gear').trim(),
-        ordem: Number(ordem) || 0,
-        ativo: true
+        nome_cliente: String(nome_cliente).trim(),
+        email_cliente: String(email_cliente).trim(),
+        whatsapp: String(whatsapp || '').trim(),
+        produto_id: String(produto_id),
+        produto_nome: String(produto_nome).trim(),
+        produto_preco: formatPreco(produto_preco),
+        status: 'pendente',
+        observacoes: String(observacoes || '').trim()
       })
       .select()
       .single();
 
     if (error) {
-      console.error('Erro ao criar serviço:', error);
+      console.error('Erro ao criar pedido:', error);
       return new Response(
-        JSON.stringify({ success: false, error: 'Erro ao criar serviço' }),
+        JSON.stringify({ success: false, error: 'Erro ao criar pedido' }),
         { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
@@ -103,15 +122,15 @@ export async function POST(req) {
       { status: 201, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   } catch (error) {
-    console.error('Erro ao criar serviço:', error);
+    console.error('Erro ao criar pedido:', error);
     return new Response(
-      JSON.stringify({ success: false, error: 'Erro ao criar serviço' }),
+      JSON.stringify({ success: false, error: 'Erro ao criar pedido' }),
       { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
 }
 
-/** PUT — Atualiza serviço (autenticado) */
+/** PUT — Atualiza pedido (autenticado) */
 export async function PUT(req) {
   const user = verifyToken(req);
   if (!user) {
@@ -123,7 +142,7 @@ export async function PUT(req) {
 
   try {
     const body = await req.json();
-    const { id, titulo, descricao, icon, ordem } = body;
+    const { id, status, observacoes } = body;
 
     if (!id) {
       return new Response(
@@ -133,23 +152,21 @@ export async function PUT(req) {
     }
 
     const updates = {};
-    if (titulo) updates.titulo = String(titulo).trim();
-    if (descricao) updates.descricao = String(descricao).trim();
-    if (icon) updates.icon = String(icon).trim();
-    if (ordem !== undefined) updates.ordem = Number(ordem);
+    if (status) updates.status = String(status);
+    if (observacoes !== undefined) updates.observacoes = String(observacoes).trim();
     updates.updated_at = new Date().toISOString();
 
     const { data, error } = await supabaseAdmin
-      .from('servicos')
+      .from('pedidos')
       .update(updates)
       .eq('id', id)
       .select()
       .single();
 
     if (error) {
-      console.error('Erro ao atualizar serviço:', error);
+      console.error('Erro ao atualizar pedido:', error);
       return new Response(
-        JSON.stringify({ success: false, error: 'Serviço não encontrado' }),
+        JSON.stringify({ success: false, error: 'Pedido não encontrado' }),
         { status: 404, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
@@ -159,15 +176,15 @@ export async function PUT(req) {
       { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   } catch (error) {
-    console.error('Erro ao atualizar serviço:', error);
+    console.error('Erro ao atualizar pedido:', error);
     return new Response(
-      JSON.stringify({ success: false, error: 'Erro ao atualizar serviço' }),
+      JSON.stringify({ success: false, error: 'Erro ao atualizar pedido' }),
       { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
 }
 
-/** DELETE — Remove serviço (autenticado) */
+/** DELETE — Remove pedido (autenticado) */
 export async function DELETE(req) {
   const user = verifyToken(req);
   if (!user) {
@@ -189,26 +206,26 @@ export async function DELETE(req) {
     }
 
     const { error } = await supabaseAdmin
-      .from('servicos')
-      .update({ ativo: false, updated_at: new Date().toISOString() })
+      .from('pedidos')
+      .delete()
       .eq('id', id);
 
     if (error) {
-      console.error('Erro ao remover serviço:', error);
+      console.error('Erro ao remover pedido:', error);
       return new Response(
-        JSON.stringify({ success: false, error: 'Erro ao remover serviço' }),
+        JSON.stringify({ success: false, error: 'Erro ao remover pedido' }),
         { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
 
     return new Response(
-      JSON.stringify({ success: true, message: 'Serviço removido com sucesso' }),
+      JSON.stringify({ success: true, message: 'Pedido removido com sucesso' }),
       { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   } catch (error) {
-    console.error('Erro ao remover serviço:', error);
+    console.error('Erro ao remover pedido:', error);
     return new Response(
-      JSON.stringify({ success: false, error: 'Erro ao remover serviço' }),
+      JSON.stringify({ success: false, error: 'Erro ao remover pedido' }),
       { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }

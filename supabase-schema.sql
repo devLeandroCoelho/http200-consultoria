@@ -1,3 +1,4 @@
+
 -- ============================================
 -- HTTP200.TI — Script SQL para Supabase
 -- ============================================
@@ -32,11 +33,48 @@ CREATE TABLE IF NOT EXISTS config (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- ============================================
+-- ISSUE #17 — Loja de Templates Digitais
+-- ============================================
+
+-- Tabela de Produtos (template kits)
+CREATE TABLE IF NOT EXISTS produtos (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  nome TEXT NOT NULL,
+  descricao TEXT NOT NULL,
+  preco DECIMAL(10,2) NOT NULL DEFAULT 0,
+  imagem_url TEXT DEFAULT '',
+  categoria TEXT DEFAULT '',
+  tags TEXT[] DEFAULT '{}',
+  ativo BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Tabela de Pedidos (compras de templates)
+CREATE TABLE IF NOT EXISTS pedidos (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  nome_cliente TEXT NOT NULL,
+  email_cliente TEXT NOT NULL,
+  whatsapp TEXT DEFAULT '',
+  produto_id UUID NOT NULL REFERENCES produtos(id) ON DELETE RESTRICT,
+  produto_nome TEXT NOT NULL,
+  produto_preco DECIMAL(10,2) NOT NULL,
+  status TEXT DEFAULT 'pendente' CHECK (status IN ('pendente', 'pago', 'entregue', 'cancelado')),
+  observacoes TEXT DEFAULT '',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Índices para performance
 CREATE INDEX IF NOT EXISTS idx_servicos_ativo ON servicos(ativo);
 CREATE INDEX IF NOT EXISTS idx_servicos_ordem ON servicos(ordem);
 CREATE INDEX IF NOT EXISTS idx_conteudo_chave ON conteudo(chave);
 CREATE INDEX IF NOT EXISTS idx_config_chave ON config(chave);
+CREATE INDEX IF NOT EXISTS idx_produtos_ativo ON produtos(ativo);
+CREATE INDEX IF NOT EXISTS idx_produtos_categoria ON produtos(categoria);
+CREATE INDEX IF NOT EXISTS idx_pedidos_status ON pedidos(status);
+CREATE INDEX IF NOT EXISTS idx_pedidos_produto ON pedidos(produto_id);
 
 -- ============================================
 -- DADOS INICIAIS
@@ -67,13 +105,15 @@ INSERT INTO config (chave, valor) VALUES
 ON CONFLICT DO NOTHING;
 
 -- ============================================
--- RLS (Row Level Security) — Opcional mas recomendado
+-- RLS (Row Level Security)
 -- ============================================
 
 -- Habilitar RLS nas tabelas
 ALTER TABLE servicos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE conteudo ENABLE ROW LEVEL SECURITY;
 ALTER TABLE config ENABLE ROW LEVEL SECURITY;
+ALTER TABLE produtos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pedidos ENABLE ROW LEVEL SECURITY;
 
 -- Políticas de leitura pública (anon)
 CREATE POLICY "Serviços são públicos para leitura" ON servicos
@@ -85,24 +125,36 @@ CREATE POLICY "Conteúdo é público para leitura" ON conteudo
 CREATE POLICY "Config é público para leitura" ON config
   FOR SELECT USING (true);
 
--- Políticas de escrita (apenas service_role — backend)
-CREATE POLICY "Backend pode inserir serviços" ON servicos
+CREATE POLICY "Produtos ativos são públicos para leitura" ON produtos
+  FOR SELECT USING (ativo = true);
+
+CREATE POLICY "Pedidos são públicos para INSERT (qualquer pessoa pode comprar)" ON pedidos
   FOR INSERT WITH CHECK (true);
+
+-- Políticas de escrita — RESTRITAS a service_role (fix MAJOR auditoria 13/08)
+CREATE POLICY "Backend pode inserir serviços" ON servicos
+  FOR INSERT WITH CHECK (auth.role() = 'service_role');
 
 CREATE POLICY "Backend pode atualizar serviços" ON servicos
-  FOR UPDATE USING (true);
+  FOR UPDATE USING (auth.role() = 'service_role');
 
 CREATE POLICY "Backend pode deletar serviços" ON servicos
-  FOR DELETE USING (true);
+  FOR DELETE USING (auth.role() = 'service_role');
 
 CREATE POLICY "Backend pode inserir conteúdo" ON conteudo
-  FOR INSERT WITH CHECK (true);
+  FOR INSERT WITH CHECK (auth.role() = 'service_role');
 
 CREATE POLICY "Backend pode atualizar conteúdo" ON conteudo
-  FOR UPDATE USING (true);
+  FOR UPDATE USING (auth.role() = 'service_role');
 
 CREATE POLICY "Backend pode inserir config" ON config
-  FOR INSERT WITH CHECK (true);
+  FOR INSERT WITH CHECK (auth.role() = 'service_role');
 
 CREATE POLICY "Backend pode atualizar config" ON config
-  FOR UPDATE USING (true);
+  FOR UPDATE USING (auth.role() = 'service_role');
+
+CREATE POLICY "Backend pode gerenciar produtos" ON produtos
+  FOR ALL USING (auth.role() = 'service_role');
+
+CREATE POLICY "Backend pode gerenciar pedidos" ON pedidos
+  FOR ALL USING (auth.role() = 'service_role');

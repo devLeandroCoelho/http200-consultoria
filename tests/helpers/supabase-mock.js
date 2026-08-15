@@ -10,6 +10,11 @@
  * (resolve de `{ data, error }`) é controlado pelo teste via
  * `supabaseState.selectResult` / `insertResult` / `updateResult` / `upsertResult`.
  *
+ * Cada `createClient(url, key)` recebe a key do ambiente e a grava em
+ * `supabaseState.clients`; toda chamada ao "banco" é etiquetada com
+ * `clientKey` para os testes verificarem que leituras usam a anon key e
+ * escritas usam a service_role key (fix MAJOR RLS — separação de papéis).
+ *
  * NUNCA toca em rede/Supabase real.
  */
 
@@ -20,6 +25,8 @@ export const supabaseState = {
   updateResult: { data: null, error: null },
   deleteResult: { data: null, error: null },
   upsertResult: { data: null, error: null },
+  /** Clientes criados: [{ url, key }] */
+  clients: [],
   /** Chamadas gravadas para asserções (data/opts enviados ao "banco") */
   selectCalls: [],
   insertCalls: [],
@@ -33,6 +40,7 @@ export const supabaseState = {
     this.updateResult = { data: null, error: null };
     this.deleteResult = { data: null, error: null };
     this.upsertResult = { data: null, error: null };
+    this.clients = [];
     this.selectCalls = [];
     this.insertCalls = [];
     this.updateCalls = [];
@@ -57,12 +65,14 @@ function resolveResult(ops) {
 }
 
 /** Cria um client mockado; cada `from(table)` devolve um builder thenable. */
-export function createMockClient() {
+export function createMockClient(url, key) {
+  supabaseState.clients.push({ url, key });
   const ops = [];
+  const clientKey = key;
 
   const builder = {
     select(columns) {
-      supabaseState.selectCalls.push({ columns });
+      supabaseState.selectCalls.push({ columns, clientKey });
       ops.push({ type: 'select' });
       return builder;
     },
@@ -77,16 +87,16 @@ export function createMockClient() {
       return builder;
     },
     upsert(data, opts) {
-      supabaseState.upsertCalls.push({ data, opts });
+      supabaseState.upsertCalls.push({ data, opts, clientKey });
       return Promise.resolve(supabaseState.upsertResult);
     },
     insert(data) {
-      supabaseState.insertCalls.push({ data });
+      supabaseState.insertCalls.push({ data, clientKey });
       ops.push({ type: 'insert', data });
       return builder;
     },
     update(data) {
-      supabaseState.updateCalls.push({ data });
+      supabaseState.updateCalls.push({ data, clientKey });
       ops.push({ type: 'update', data });
       return builder;
     },

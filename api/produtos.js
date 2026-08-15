@@ -1,16 +1,17 @@
 /**
- * HTTP200.TI Consultoria — Serviços
- * 
- * CRUD completo para gerenciamento de serviços.
- * 
+ * HTTP200.TI Consultoria — Produtos (Template Shop)
+ *
+ * CRUD completo para gerenciamento de produtos digitais (template kits).
+ *
  * Rotas:
- *   GET    /api/servicos    — Lista serviços (público)
- *   POST   /api/servicos    — Cria serviço (auth)
- *   PUT    /api/servicos    — Atualiza serviço (auth)
- *   DELETE /api/servicos?id — Remove serviço (auth)
- * 
+ *   GET    /api/produtos    — Lista produtos ativos (público)
+ *   POST   /api/produtos    — Cria produto (auth)
+ *   PUT    /api/produtos    — Atualiza produto (auth)
+ *   DELETE /api/produtos?id — Remove produto (auth)
+ *
  * Autor: Leandro Coelho — http200.ti@gmail.com
  * Versão: 1.0.0
+ * Issue: #17
  */
 
 import jwt from 'jsonwebtoken';
@@ -35,18 +36,24 @@ function verifyToken(req) {
   try { return jwt.verify(token, JWT_SECRET); } catch { return null; }
 }
 
-/** GET — Lista serviços ativos */
+function formatPreco(value) {
+  const num = Number(value);
+  if (isNaN(num)) return 0;
+  return Math.round(num * 100) / 100;
+}
+
+/** GET — Lista produtos ativos */
 export async function GET(req) {
   const { data, error } = await supabasePublic
-    .from('servicos')
+    .from('produtos')
     .select('*')
     .eq('ativo', true)
-    .order('ordem', { ascending: true });
+    .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Erro ao buscar serviços:', error);
+    console.error('Erro ao buscar produtos:', error);
     return new Response(
-      JSON.stringify({ success: false, error: 'Erro ao buscar serviços' }),
+      JSON.stringify({ success: false, error: 'Erro ao buscar produtos' }),
       { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
@@ -57,7 +64,7 @@ export async function GET(req) {
   );
 }
 
-/** POST — Cria serviço (autenticado) */
+/** POST — Cria produto (autenticado) */
 export async function POST(req) {
   const user = verifyToken(req);
   if (!user) {
@@ -69,31 +76,33 @@ export async function POST(req) {
 
   try {
     const body = await req.json();
-    const { titulo, descricao, icon, ordem } = body;
+    const { nome, descricao, preco, imagem_url, categoria, tags } = body;
 
-    if (!titulo || !descricao) {
+    if (!nome || !descricao) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Título e descrição são obrigatórios' }),
+        JSON.stringify({ success: false, error: 'Nome e descrição são obrigatórios' }),
         { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
 
     const { data, error } = await supabaseAdmin
-      .from('servicos')
+      .from('produtos')
       .insert({
-        titulo: String(titulo).trim(),
+        nome: String(nome).trim(),
         descricao: String(descricao).trim(),
-        icon: String(icon || 'gear').trim(),
-        ordem: Number(ordem) || 0,
+        preco: formatPreco(preco),
+        imagem_url: String(imagem_url || '').trim(),
+        categoria: String(categoria || '').trim(),
+        tags: Array.isArray(tags) ? tags : [],
         ativo: true
       })
       .select()
       .single();
 
     if (error) {
-      console.error('Erro ao criar serviço:', error);
+      console.error('Erro ao criar produto:', error);
       return new Response(
-        JSON.stringify({ success: false, error: 'Erro ao criar serviço' }),
+        JSON.stringify({ success: false, error: 'Erro ao criar produto' }),
         { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
@@ -103,15 +112,15 @@ export async function POST(req) {
       { status: 201, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   } catch (error) {
-    console.error('Erro ao criar serviço:', error);
+    console.error('Erro ao criar produto:', error);
     return new Response(
-      JSON.stringify({ success: false, error: 'Erro ao criar serviço' }),
+      JSON.stringify({ success: false, error: 'Erro ao criar produto' }),
       { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
 }
 
-/** PUT — Atualiza serviço (autenticado) */
+/** PUT — Atualiza produto (autenticado) */
 export async function PUT(req) {
   const user = verifyToken(req);
   if (!user) {
@@ -123,7 +132,7 @@ export async function PUT(req) {
 
   try {
     const body = await req.json();
-    const { id, titulo, descricao, icon, ordem } = body;
+    const { id, nome, descricao, preco, imagem_url, categoria, tags, ativo } = body;
 
     if (!id) {
       return new Response(
@@ -133,23 +142,26 @@ export async function PUT(req) {
     }
 
     const updates = {};
-    if (titulo) updates.titulo = String(titulo).trim();
+    if (nome) updates.nome = String(nome).trim();
     if (descricao) updates.descricao = String(descricao).trim();
-    if (icon) updates.icon = String(icon).trim();
-    if (ordem !== undefined) updates.ordem = Number(ordem);
+    if (preco !== undefined) updates.preco = formatPreco(preco);
+    if (imagem_url !== undefined) updates.imagem_url = String(imagem_url).trim();
+    if (categoria !== undefined) updates.categoria = String(categoria).trim();
+    if (tags !== undefined) updates.tags = Array.isArray(tags) ? tags : [];
+    if (ativo !== undefined) updates.ativo = Boolean(ativo);
     updates.updated_at = new Date().toISOString();
 
     const { data, error } = await supabaseAdmin
-      .from('servicos')
+      .from('produtos')
       .update(updates)
       .eq('id', id)
       .select()
       .single();
 
     if (error) {
-      console.error('Erro ao atualizar serviço:', error);
+      console.error('Erro ao atualizar produto:', error);
       return new Response(
-        JSON.stringify({ success: false, error: 'Serviço não encontrado' }),
+        JSON.stringify({ success: false, error: 'Produto não encontrado' }),
         { status: 404, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
@@ -159,15 +171,15 @@ export async function PUT(req) {
       { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   } catch (error) {
-    console.error('Erro ao atualizar serviço:', error);
+    console.error('Erro ao atualizar produto:', error);
     return new Response(
-      JSON.stringify({ success: false, error: 'Erro ao atualizar serviço' }),
+      JSON.stringify({ success: false, error: 'Erro ao atualizar produto' }),
       { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
 }
 
-/** DELETE — Remove serviço (autenticado) */
+/** DELETE — Remove produto (autenticado) */
 export async function DELETE(req) {
   const user = verifyToken(req);
   if (!user) {
@@ -189,26 +201,26 @@ export async function DELETE(req) {
     }
 
     const { error } = await supabaseAdmin
-      .from('servicos')
+      .from('produtos')
       .update({ ativo: false, updated_at: new Date().toISOString() })
       .eq('id', id);
 
     if (error) {
-      console.error('Erro ao remover serviço:', error);
+      console.error('Erro ao remover produto:', error);
       return new Response(
-        JSON.stringify({ success: false, error: 'Erro ao remover serviço' }),
+        JSON.stringify({ success: false, error: 'Erro ao remover produto' }),
         { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
 
     return new Response(
-      JSON.stringify({ success: true, message: 'Serviço removido com sucesso' }),
+      JSON.stringify({ success: true, message: 'Produto removido com sucesso' }),
       { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   } catch (error) {
-    console.error('Erro ao remover serviço:', error);
+    console.error('Erro ao remover produto:', error);
     return new Response(
-      JSON.stringify({ success: false, error: 'Erro ao remover serviço' }),
+      JSON.stringify({ success: false, error: 'Erro ao remover produto' }),
       { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   }
