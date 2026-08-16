@@ -477,6 +477,19 @@ button {
     box-shadow: 0 4px 20px rgba(var(--secondary-rgb), 0.2);
 }
 
+.btn-secondary {
+    border: 2px solid rgba(var(--primary-rgb), 0.5);
+    color: var(--primary);
+    background: transparent;
+}
+
+.btn-secondary:hover {
+    border-color: var(--primary);
+    background: rgba(var(--primary-rgb), 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(var(--primary-rgb), 0.2);
+}
+
 .btn-primary {
     background: var(--success);
     color: var(--primary);
