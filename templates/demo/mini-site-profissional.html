@@ -1,57 +1,172 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Demo — Mini Site Profissional</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; color: #0f172a; background: #fff; }
-    nav { background: #0f172a; color: #fff; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
-    nav .logo { font-weight: 800; font-size: 18px; }
-    nav .badge { background: #f97316; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
-    .hero { background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff; padding: 64px 16px; text-align: center; }
-    .hero h2 { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
-    .hero p { opacity: .85; font-size: 15px; max-width: 520px; margin: 0 auto; }
-    .section { max-width: 960px; margin: 0 auto; padding: 48px 16px; }
-    .section h3 { font-size: 22px; font-weight: 700; margin-bottom: 18px; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-    .card { border: 1px solid #e5e7eb; border-radius: 14px; padding: 20px; background: #fff; transition: all .2s; }
-    .card:hover { border-color: #f97316; transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,.08); }
-    .card h4 { font-size: 16px; margin-bottom: 8px; }
-    .card p { color: #6b7280; font-size: 13px; line-height: 1.5; }
-    .cta-section { background: #0f172a; color: #fff; padding: 40px 16px; text-align: center; }
-    .cta-section h3 { font-size: 22px; margin-bottom: 10px; }
-    .btn { display: inline-block; margin-top: 14px; padding: 12px 24px; border-radius: 10px; background: #f97316; color: #fff; text-decoration: none; font-weight: 600; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo — Mini Site Profissional</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="sales.css">
+    <style>
+        .demo-badge {
+            position: fixed; top: 16px; right: 16px; background: #f97316; color: #fff;
+            padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+            z-index: 1000; box-shadow: 0 4px 12px rgba(249,115,22,.4);
+        }
+    </style>
 </head>
 <body>
-  <nav>
-    <div class="logo">João Silva</div>
-    <span class="badge">DEMO</span>
-  </nav>
-  <div class="hero">
-    <h2>Desenvolvedor Freelancer</h2>
-    <p>Sites profissionais, landing pages de alta conversão e presença digital para pequenos negócios.</p>
-  </div>
-  <div class="section">
-    <h3>Serviços</h3>
-    <div class="cards">
-      <div class="card"><h4>Sites Institucionais</h4><p>Site one-page moderno e responsivo para apresentar seu negócio.</p></div>
-      <div class="card"><h4>Landing Pages</h4><p>Páginas de alta conversão para campanhas e vendas.</p></div>
-      <div class="card"><h4>SEO & Performance</h4><p>Otimização para Google e carregamento ultrarrápido.</p></div>
-    </div>
-  </div>
-  <div class="section">
-    <h3>Sobre</h3>
-    <p style="color:#6b7280; line-height:1.6; max-width: 720px;">Com 8 anos de experiência em desenvolvimento web, ajudo pequenos negócios a terem presença digital profissional sem complicação. Trabalho com foco em resultado, design limpo e performance.</p>
-  </div>
-  <div class="cta-section">
-    <h3>Vamos conversar?</h3>
-    <p style="opacity:.8; font-size:14px;">Orçamento sem compromisso em até 24h</p>
-    <a class="btn" href="https://wa.me/5500000000000" target="_blank">WhatsApp</a>
-  </div>
+    <div class="demo-badge">DEMO</div>
+
+    <!-- Hero -->
+    <section className="hero-mini">
+        <div className="hero-mini-content">
+            <div className="logo-placeholder">
+                <svg width="80" height="80" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="120" height="120" rx="28" fill="#FDFCFB" stroke="#E85D04" strokeWidth="6"/>
+                    <rect x="18" y="18" width="84" height="84" rx="16" fill="#FFFFFF" stroke="#0B1E2F" strokeWidth="3"/>
+                    <g stroke="#0B1E2F" strokeWidth="6" strokeLinecap="round">
+                        <path d="M28 40h64" opacity="0.95"/>
+                        <path d="M28 58h48" opacity="0.9"/>
+                        <path d="M28 76h56" opacity="0.85"/>
+                    </g>
+                    <g transform="translate(72, 72)">
+                        <circle cx="24" cy="24" r="24" fill="#E85D04"/>
+                        <path d="M14 24l7 7 14-14" stroke="#FDFCFB" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                    </g>
+                </svg>
+            </div>
+            <h1>Silva & Oliveira</h1>
+            <p className="hero-subtitle-mini">Soluções Profissionais para sua Empresa</p>
+            <p className="hero-typing">Qualidade • Confiança • Atendimento</p>
+        </div>
+    </section>
+
+    <!-- Sobre -->
+    <section className="section-mini">
+        <div className="container-mini">
+            <h2>Sobre nós</h2>
+            <p>Somos uma empresa de soluções profissionais com atuação regional. Atendemos empresas e profissionais com produtos e serviços de qualidade, preço justo e atendimento personalizado.</p>
+        </div>
+    </section>
+
+    <!-- Produtos -->
+    <section className="section-mini section-alt-mini">
+        <div className="container-mini">
+            <h2>Nossos Produtos</h2>
+            <p>Linha completa de produtos profissionais. Consulte-nos para orçamentos personalizados.</p>
+            <div className="products-mini">
+                <div className="product-mini">
+                    <div className="product-icon-mini">🛡️</div>
+                    <h3>Equipamentos</h3>
+                    <p>Linha completa de equipamentos profissionais certificados.</p>
+                </div>
+                <div className="product-mini">
+                    <div className="product-icon-mini">👕</div>
+                    <h3>Uniformes</h3>
+                    <p>Uniformes profissionais de alta durabilidade e conforto.</p>
+                </div>
+                <div className="product-mini">
+                    <div className="product-icon-mini">👟</div>
+                    <h3>Calçados</h3>
+                    <p>Calçados de segurança para diferentes tipos de atividade.</p>
+                </div>
+                <div className="product-mini">
+                    <div className="product-icon-mini">🥽</div>
+                    <h3>Proteção</h3>
+                    <p>Óculos, luvas, máscaras e outros equipamentos de proteção.</p>
+                </div>
+            </div>
+            <div className="text-center mt-8">
+                <a href="#" class="btn btn-primary" onclick="alert('Demo: download do catálogo')">📥 Baixar Catálogo</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Diferenciais -->
+    <section className="section-mini">
+        <div className="container-mini">
+            <h2>Por que escolher a Silva & Oliveira?</h2>
+            <div className="grid-mini">
+                <div className="card-mini">
+                    <div className="card-icon-mini">✅</div>
+                    <h3>Qualidade</h3>
+                    <p>Produtos certificados e confiáveis para sua segurança.</p>
+                </div>
+                <div className="card-mini">
+                    <div className="card-icon-mini">💰</div>
+                    <h3>Preço justo</h3>
+                    <p>Orçamentos competitivos sem comprometer a qualidade.</p>
+                </div>
+                <div className="card-mini">
+                    <div className="card-icon-mini">🚚</div>
+                    <h3>Entrega rápida</h3>
+                    <p>Atendimento ágil e entrega para toda a região.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Galeria -->
+    <section className="section-mini section-alt-mini">
+        <div className="container-mini">
+            <h2>Galeria</h2>
+            <div className="grid-mini">
+                <div className="gallery-item">📸 Foto do estabelecimento</div>
+                <div className="gallery-item">📸 Produtos em destaque</div>
+                <div className="gallery-item">📸 Equipe de atendimento</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Localização -->
+    <section className="section-mini">
+        <div className="container-mini">
+            <h2>Onde estamos</h2>
+            <div className="map-mini">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3548.0!2d-48.6872!3d-26.6497!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94d92be0608d4297%3A0xd6597c22b2743fd5!2sBarra%20Velha%20SC!5e0!3m2!1spt-BR!2sbr!4v1234567890" width="100%" height="300" style="border:0;" allowFullScreen="" loading="lazy" referrerPolicy="no-referrer-when-downgrade" title="Localização"></iframe>
+            </div>
+            <div className="address-mini">
+                <p><strong>Endereço:</strong> Av. Principal, nº 123 - Centro, Cidade - SC, 88390-000</p>
+                <p><strong>Atendimento:</strong> Seg-Sex 08:00-18:00 | Sáb 08:00-12:00</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contato -->
+    <section className="contact-mini">
+        <div className="container-mini">
+            <h2>Contato</h2>
+            <p>Entre em contato para orçamentos e informações.</p>
+            <div className="contact-grid-mini">
+                <div className="contact-card-mini">
+                    <div className="contact-icon-mini">📱</div>
+                    <h3>WhatsApp</h3>
+                    <p>(47) 99999-9999</p>
+                    <a href="https://wa.me/5547999999999?text=Ol%C3%A1%2C%20peguei%20seu%20contato%20no%20site%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es." className="btn btn-primary btn-small" target="_blank">Chamar no WhatsApp</a>
+                </div>
+                <div className="contact-card-mini">
+                    <div className="contact-icon-mini">📧</div>
+                    <h3>Email</h3>
+                    <p>contato@silvaoliveira.com.br</p>
+                    <a href="mailto:contato@silvaoliveira.com.br" className="btn btn-outline btn-small">Enviar email</a>
+                </div>
+                <div className="contact-card-mini">
+                    <div className="contact-icon-mini">📍</div>
+                    <h3>Localização</h3>
+                    <p>Av. Principal, 123 - Centro</p>
+                    <span className="text-sm">Cidade - SC</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer className="footer-mini">
+        <div className="container-mini">
+            <p>© 2026 Silva & Oliveira — Todos os direitos reservados</p>
+            <p className="text-sm opacity-70">Desenvolvido por HTTP200.TI</p>
+        </div>
+    </footer>
 </body>
 </html>
