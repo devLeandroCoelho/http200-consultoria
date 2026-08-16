@@ -17,7 +17,7 @@ const VALID_PASS = process.env.ADMIN_PASS;
 function makeRequest({ method = 'POST', body, token, origin = 'http://localhost:3000' } = {}) {
   const headers = { 'Content-Type': 'application/json' };
   if (origin) headers.Origin = origin;
-  if (token) headers.Authorization = `Bearer ${token}`;
+  if (token) headers.Cookie = `admin_token=${token}`;
   return new Request('http://localhost/api/auth', {
     method,
     headers,
@@ -49,9 +49,9 @@ describe('POST /api/auth — login', () => {
     expect(json.data.user).toBe(VALID_USER);
     expect(json.data.expiresIn).toBe('24h');
 
-    const decoded = jwt.verify(json.data.token, SECRET);
-    expect(decoded.user).toBe(VALID_USER);
-    expect(decoded.role).toBe('admin');
+    const cookieHeader = res.headers.get('set-cookie');
+    expect(cookieHeader).toBeTruthy();
+    expect(cookieHeader).toContain('admin_token=');
   });
 
   it('retorna 401 com credenciais inválidas', async () => {
@@ -129,12 +129,12 @@ describe('GET /api/auth — validação de token', () => {
     expect(json.error).toBe('Token inválido ou expirado');
   });
 
-  it('retorna 401 com header Authorization fora do formato Bearer', async () => {
+  it('retorna 401 com cookie malformado', async () => {
     const token = signToken({ user: 'x' }, { expiresIn: '1h' });
     const res = await GET(
       new Request('http://localhost/api/auth', {
         method: 'GET',
-        headers: { Authorization: `Token ${token}` },
+        headers: { Cookie: `admin_token=invalid` },
       })
     );
 
