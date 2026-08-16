@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acompanhar Pedido — HTTP200.TI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .pedido-container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+        .pedido-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .pedido-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .pedido-header p {
+            color: var(--text-secondary);
+        }
+        .pedido-form {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: rgba(var(--primary-rgb), 0.5);
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 1rem;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+        .pedido-submit {
+            width: 100%;
+            padding: 0.9rem;
+            border-radius: 8px;
+            border: none;
+            background: var(--secondary);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .pedido-submit:hover {
+            background: #2563eb;
+        }
+        .pedido-result {
+            display: none;
+        }
+        .pedido-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        .pedido-card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        .pedido-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .pedido-row:last-child {
+            border-bottom: none;
+        }
+        .pedido-row-label {
+            color: var(--text-secondary);
+        }
+        .pedido-row-value {
+            font-weight: 600;
+            text-align: right;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        .status-pendente { background: rgba(234, 179, 8, 0.15); color: #facc15; }
+        .status-pago { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+        .status-entregue { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .status-cancelado { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+        .pedido-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+        .back-link:hover {
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <div class="pedido-container">
+        <a href="/" class="back-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Voltar para o site
+        </a>
+
+        <div class="pedido-header">
+            <h1>Acompanhar Pedido</h1>
+            <p>Informe o ID do pedido para ver o status</p>
+        </div>
+
+        <div id="pedidoError" class="pedido-error"></div>
+
+        <div id="pedidoFormWrapper">
+            <form id="pedidoForm" class="pedido-form">
+                <div class="form-group">
+                    <label for="pedidoId">ID do Pedido</label>
+                    <input type="text" id="pedidoId" name="pedidoId" required placeholder="Cole o ID do pedido">
+                </div>
+                <button type="submit" class="pedido-submit">Buscar Pedido</button>
+            </form>
+        </div>
+
+        <div id="pedidoResult" class="pedido-result">
+            <div class="pedido-card">
+                <h2 id="pedidoResultTitle">Pedido</h2>
+                <div class="pedido-row">
+                    <span class="pedido-row-label">Produto</span>
+                    <span class="pedido-row-value" id="pedidoResultProduto"></span>
+                </div>
+                <div class="pedido-row">
+                    <span class="pedido-row-label">Cliente</span>
+                    <span class="pedido-row-value" id="pedidoResultCliente"></span>
+                </div>
+                <div class="pedido-row">
+                    <span class="pedido-row-label">Email</span>
+                    <span class="pedido-row-value" id="pedidoResultEmail"></span>
+                </div>
+                <div class="pedido-row">
+                    <span class="pedido-row-label">WhatsApp</span>
+                    <span class="pedido-row-value" id="pedidoResultWhatsapp"></span>
+                </div>
+                <div class="pedido-row">
+                    <span class="pedido-row-label">Valor</span>
+                    <span class="pedido-row-value" id="pedidoResultValor"></span>
+                </div>
+                <div class="pedido-row">
+                    <span class="pedido-row-label">Status</span>
+                    <span class="pedido-row-value" id="pedidoResultStatus"></span>
+                </div>
+                <div class="pedido-row">
+                    <span class="pedido-row-label">Data</span>
+                    <span class="pedido-row-value" id="pedidoResultData"></span>
+                </div>
+                <div class="pedido-row" id="pedidoObsRow" style="display:none;">
+                    <span class="pedido-row-label">Observações</span>
+                    <span class="pedido-row-value" id="pedidoResultObs"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const pedidoForm = document.getElementById('pedidoForm');
+            const pedidoError = document.getElementById('pedidoError');
+            const pedidoFormWrapper = document.getElementById('pedidoFormWrapper');
+            const pedidoResult = document.getElementById('pedidoResult');
+            const pedidoIdInput = document.getElementById('pedidoId');
+
+            function showError(message) {
+                pedidoError.textContent = message;
+                pedidoError.style.display = 'block';
+            }
+
+            function hideError() {
+                pedidoError.style.display = 'none';
+            }
+
+            pedidoForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                hideError();
+                const id = pedidoIdInput.value.trim();
+                if (!id) {
+                    showError('Informe o ID do pedido.');
+                    return;
+                }
+                try {
+                    const res = await fetch(`/api/pedidos/${encodeURIComponent(id)}`);
+                    const json = await res.json();
+                    if (!json.success || !json.data) {
+                        throw new Error(json.error || 'Pedido não encontrado');
+                    }
+                    renderPedido(json.data);
+                } catch (err) {
+                    showError(err.message || 'Erro ao buscar pedido.');
+                }
+            });
+
+            function renderPedido(pedido) {
+                pedidoFormWrapper.style.display = 'none';
+                pedidoResult.style.display = 'block';
+
+                document.getElementById('pedidoResultTitle').textContent = `Pedido #${pedido.id.slice(-8).toUpperCase()}`;
+                document.getElementById('pedidoResultProduto').textContent = pedido.produto_nome || '-';
+                document.getElementById('pedidoResultCliente').textContent = pedido.nome_cliente || '-';
+                document.getElementById('pedidoResultEmail').textContent = pedido.email_cliente || '-';
+                document.getElementById('pedidoResultWhatsapp').textContent = pedido.whatsapp || '-';
+                document.getElementById('pedidoResultValor').textContent = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(pedido.produto_preco || 0));
+                
+                const statusEl = document.getElementById('pedidoResultStatus');
+                const status = String(pedido.status || 'pendente').toLowerCase();
+                statusEl.innerHTML = `<span class="status-badge status-${status}">${status}</span>`;
+                
+                const data = new Date(pedido.created_at).toLocaleString('pt-BR');
+                document.getElementById('pedidoResultData').textContent = data;
+
+                const obs = String(pedido.observacoes || '').trim();
+                const obsRow = document.getElementById('pedidoObsRow');
+                const obsEl = document.getElementById('pedidoResultObs');
+                if (obs) {
+                    obsRow.style.display = 'flex';
+                    obsEl.textContent = obs;
+                } else {
+                    obsRow.style.display = 'none';
+                }
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            const idParam = params.get('id');
+            if (idParam) {
+                pedidoIdInput.value = idParam;
+                pedidoForm.dispatchEvent(new Event('submit'));
+            }
+        })();
+    </script>
+</body>
+</html>

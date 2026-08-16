@@ -6,10 +6,11 @@
  * Apenas admin pode listar/atualizar status/excluir.
  *
  * Rotas:
- *   GET    /api/pedidos    — Lista pedidos (auth)
- *   POST   /api/pedidos    — Cria pedido (público)
- *   PUT    /api/pedidos    — Atualiza pedido (auth)
- *   DELETE /api/pedidos?id — Remove pedido (auth)
+ *   GET    /api/pedidos          — Lista pedidos (auth)
+ *   GET    /api/pedidos/:id      — Busca pedido por ID (público)
+ *   POST   /api/pedidos          — Cria pedido (público)
+ *   PUT    /api/pedidos          — Atualiza pedido (auth)
+ *   DELETE /api/pedidos?id=      — Remove pedido (auth)
  *
  * Autor: Leandro Coelho — http200.ti@gmail.com
  * Versão: 1.0.0
@@ -29,6 +30,9 @@ if (!JWT_SECRET) {
   );
 }
 
+const WHATSAPP_OWNER_NUMBER = process.env.WHATSAPP_OWNER_NUMBER || '';
+const WHATSAPP_NOTIFY_TOKEN = process.env.WHATSAPP_NOTIFY_TOKEN || '';
+
 const ENDPOINT_METHODS = 'GET, POST, PUT, DELETE, OPTIONS';
 
 function verifyToken(req) {
@@ -42,6 +46,44 @@ function formatPreco(value) {
   const num = Number(value);
   if (isNaN(num)) return 0;
   return Math.round(num * 100) / 100;
+}
+
+function formatWhatsAppNumber(raw) {
+  const digits = String(raw || '').replace(/\D/g, '');
+  if (!digits) return '';
+  if (digits.startsWith('55') && digits.length > 12) {
+    return '+' + digits;
+  }
+  return '+' + digits;
+}
+
+async function notifyWhatsApp(pedido) {
+  if (!WHATSAPP_OWNER_NUMBER || !WHATSAPP_NOTIFY_TOKEN) {
+    console.log('[whatsapp] WHATSAPP_OWNER_NUMBER ou WHATSAPP_NOTIFY_TOKEN não definidos. Pulando notificação.');
+    return;
+  }
+
+  const phone = formatWhatsAppNumber(WHATSAPP_OWNER_NUMBER);
+  const message = encodeURIComponent(
+    `🛒 Novo pedido recebido!\n\n` +
+    `Cliente: ${pedido.nome_cliente}\n` +
+    `Email: ${pedido.email_cliente}\n` +
+    `WhatsApp: ${pedido.whatsapp || 'não informado'}\n` +
+    `Produto: ${pedido.produto_nome}\n` +
+    `Valor: R$ ${Number(pedido.produto_preco).toFixed(2)}\n` +
+    `ID: ${pedido.id}\n` +
+    `Status: ${pedido.status}`
+  );
+
+  const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(phone)}&text=${message}&apikey=${encodeURIComponent(WHATSAPP_NOTIFY_TOKEN)}`;
+
+  try {
+    const res = await fetch(url);
+    const text = await res.text();
+    console.log('[whatsapp] CallMeBot response:', res.status, text);
+  } catch (err) {
+    console.error('[whatsapp] Erro ao notificar:', err);
+  }
 }
 
 /** GET — Lista pedidos (autenticado) */
@@ -116,6 +158,8 @@ export async function POST(req) {
         { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
       );
     }
+
+    notifyWhatsApp(data);
 
     return new Response(
       JSON.stringify({ success: true, data }),
