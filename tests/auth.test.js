@@ -166,6 +166,6 @@ describe('OPTIONS /api/auth — preflight CORS', () => {
     const res = await OPTIONS(makeRequest({ method: 'OPTIONS' }));
 
     expect(res.status).toBe(204);
-    expect(res.headers.get('Access-Control-Allow-Methods')).toBe('GET, POST, OPTIONS');
+    expect(res.headers.get('Access-Control-Allow-Methods')).toBe('GET, POST, DELETE, OPTIONS');
   });
 });
