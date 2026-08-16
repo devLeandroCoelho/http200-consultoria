@@ -771,12 +771,9 @@
        UTILS
     =========================== */
     const API = '/api';
-    let token = localStorage.getItem('admin_token');
 
     function getHeaders(auth = true) {
-      const h = { 'Content-Type': 'application/json' };
-      if (auth && token) h['Authorization'] = 'Bearer ' + token;
-      return h;
+      return { 'Content-Type': 'application/json' };
     }
 
     function toast(msg, type = 'info') {
@@ -793,7 +790,6 @@
         headers: getHeaders(opts.auth !== false)
       });
       if (res.status === 401) {
-        localStorage.removeItem('admin_token');
         window.location.href = '/login.html';
         return null;
       }
@@ -801,9 +797,12 @@
     }
 
     /* Auth check */
-    if (!token) {
-      window.location.href = '/login.html';
-    }
+    (async () => {
+      const res = await fetch('/api/auth');
+      if (res.status === 401) {
+        window.location.href = '/login.html';
+      }
+    })();
 
     /* ===========================
        NAVIGATION
@@ -845,9 +844,9 @@
     });
 
     /* Logout */
-    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+    document.getElementById('logoutBtn').addEventListener('click', async (e) => {
       e.preventDefault();
-      localStorage.removeItem('admin_token');
+      await fetch('/api/auth', { method: 'DELETE' });
       window.location.href = '/login.html';
     });
 

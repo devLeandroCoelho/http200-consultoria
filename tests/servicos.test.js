@@ -10,7 +10,7 @@ import { supabaseState } from './helpers/supabase-mock.js';
 
 vi.mock('@supabase/supabase-js', async () => {
   const { createMockClient } = await import('./helpers/supabase-mock.js');
-  return { createClient: () => createMockClient() };
+  return { createClient: (url, key) => createMockClient(url, key) };
 });
 
 import { GET, POST, PUT, DELETE, OPTIONS } from '../api/servicos.js';
@@ -213,6 +213,28 @@ describe('DELETE /api/servicos — autenticado', () => {
     expect(res.status).toBe(500);
     const json = await res.json();
     expect(json.error).toBe('Erro ao remover serviço');
+  });
+});
+
+describe('Separação de clientes — fix MAJOR RLS (13/08)', () => {
+  it('leituras públicas usam a anon key', async () => {
+    await GET(makeRequest());
+
+    expect(supabaseState.selectCalls).toHaveLength(1);
+    expect(supabaseState.selectCalls[0].clientKey).toBe(process.env.SUPABASE_ANON_KEY);
+  });
+
+  it('escritas autenticadas usam a service_role key (POST/PUT/DELETE)', async () => {
+    supabaseState.insertResult = { data: { id: 1, titulo: 'X' }, error: null };
+    supabaseState.updateResult = { data: { id: 1 }, error: null };
+
+    await POST(makeRequest({ method: 'POST', token: validToken(), body: { titulo: 'X', descricao: 'Y' } }));
+    await PUT(makeRequest({ method: 'PUT', token: validToken(), body: { id: 1, titulo: 'Z' } }));
+    await DELETE(makeRequest({ method: 'DELETE', token: validToken(), url: 'http://localhost/api/servicos?id=1' }));
+
+    expect(supabaseState.insertCalls[0].clientKey).toBe(process.env.SERVICE_ROLE_KEY);
+    expect(supabaseState.updateCalls[0].clientKey).toBe(process.env.SERVICE_ROLE_KEY);
+    expect(supabaseState.updateCalls[1].clientKey).toBe(process.env.SERVICE_ROLE_KEY);
   });
 });
 

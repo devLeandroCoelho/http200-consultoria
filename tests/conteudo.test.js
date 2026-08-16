@@ -11,7 +11,7 @@ import { supabaseState } from './helpers/supabase-mock.js';
 
 vi.mock('@supabase/supabase-js', async () => {
   const { createMockClient } = await import('./helpers/supabase-mock.js');
-  return { createClient: () => createMockClient() };
+  return { createClient: (url, key) => createMockClient(url, key) };
 });
 
 import { GET, PUT, OPTIONS } from '../api/conteudo.js';
@@ -180,6 +180,24 @@ describe('PUT /api/conteudo — autenticado', () => {
     expect(res.status).toBe(500);
     const json = await res.json();
     expect(json.error).toBe('Erro ao atualizar conteúdo');
+  });
+});
+
+describe('Separação de clientes — fix MAJOR RLS (13/08)', () => {
+  it('leituras públicas usam a anon key', async () => {
+    await GET(makeRequest());
+
+    expect(supabaseState.selectCalls).toHaveLength(1);
+    expect(supabaseState.selectCalls[0].clientKey).toBe(process.env.SUPABASE_ANON_KEY);
+  });
+
+  it('escritas autenticadas usam a service_role key', async () => {
+    supabaseState.upsertResult = { data: null, error: null };
+
+    await PUT(makeRequest({ method: 'PUT', token: validToken(), body: { hero: { titulo: 'X' } } }));
+
+    expect(supabaseState.upsertCalls).toHaveLength(1);
+    expect(supabaseState.upsertCalls[0].clientKey).toBe(process.env.SERVICE_ROLE_KEY);
   });
 });
 

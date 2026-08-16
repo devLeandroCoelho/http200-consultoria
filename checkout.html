@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout — HTTP200.TI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .checkout-container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+        .checkout-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .checkout-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .checkout-header p {
+            color: var(--text-secondary);
+        }
+        .checkout-product {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+        .checkout-product-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            background: rgba(var(--secondary-rgb), 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .checkout-product-icon svg {
+            width: 32px;
+            height: 32px;
+            color: var(--secondary);
+        }
+        .checkout-product-info h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+        .checkout-product-info p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .checkout-product-price {
+            margin-top: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .checkout-form {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: rgba(var(--primary-rgb), 0.5);
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            transition: border-color var(--transition-fast);
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .checkout-submit {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 8px;
+            border: none;
+            background: var(--secondary);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+        .checkout-submit:hover {
+            background: #2563eb;
+        }
+        .checkout-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .checkout-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+        .checkout-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            display: none;
+        }
+        .checkout-success h2 {
+            margin-bottom: 0.75rem;
+            color: #34d399;
+        }
+        .checkout-success a {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+        .checkout-loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            transition: color var(--transition-fast);
+        }
+        .back-link:hover {
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <div class="checkout-container">
+        <a href="/" class="back-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Voltar para o site
+        </a>
+
+        <div class="checkout-header">
+            <h1>Finalizar Pedido</h1>
+            <p>Preencha seus dados para receber o template escolhido</p>
+        </div>
+
+        <div id="checkoutLoading" class="checkout-loading">
+            <div class="spinner"></div>
+            <p>Carregando produto...</p>
+        </div>
+
+        <div id="checkoutError" class="checkout-error"></div>
+
+        <div id="checkoutFormWrapper">
+            <div id="checkoutProduct" class="checkout-product" style="display:none;">
+                <div class="checkout-product-icon" id="checkoutProductIcon"></div>
+                <div class="checkout-product-info">
+                    <h3 id="checkoutProductName"></h3>
+                    <p id="checkoutProductDesc"></p>
+                    <div class="checkout-product-price" id="checkoutProductPrice"></div>
+                </div>
+            </div>
+
+            <form id="checkoutForm" class="checkout-form">
+                <div class="form-group">
+                    <label for="nome">Nome completo *</label>
+                    <input type="text" id="nome" name="nome" required placeholder="Seu nome completo">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="whatsapp">WhatsApp</label>
+                    <input type="tel" id="whatsapp" name="whatsapp" placeholder="(00) 00000-0000">
+                </div>
+                <div class="form-group">
+                    <label for="observacoes">Observações</label>
+                    <textarea id="observacoes" name="observacoes" placeholder="Alguma observação ou customização desejada?"></textarea>
+                </div>
+                <button type="submit" class="checkout-submit" id="checkoutSubmitBtn">
+                    Solicitar Template
+                </button>
+            </form>
+        </div>
+
+        <div id="checkoutSuccess" class="checkout-success">
+            <h2>Pedido realizado com sucesso!</h2>
+            <p id="checkoutSuccessMessage"></p>
+            <p style="margin-top:1rem;">
+                <a href="/pedido.html?id=" id="checkoutSuccessLink">Acompanhar status do pedido</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const params = new URLSearchParams(window.location.search);
+            const produtoParam = params.get('produto');
+
+            const checkoutLoading = document.getElementById('checkoutLoading');
+            const checkoutError = document.getElementById('checkoutError');
+            const checkoutFormWrapper = document.getElementById('checkoutFormWrapper');
+            const checkoutProduct = document.getElementById('checkoutProduct');
+            const checkoutProductName = document.getElementById('checkoutProductName');
+            const checkoutProductDesc = document.getElementById('checkoutProductDesc');
+            const checkoutProductPrice = document.getElementById('checkoutProductPrice');
+            const checkoutProductIcon = document.getElementById('checkoutProductIcon');
+            const checkoutForm = document.getElementById('checkoutForm');
+            const checkoutSubmitBtn = document.getElementById('checkoutSubmitBtn');
+            const checkoutSuccess = document.getElementById('checkoutSuccess');
+            const checkoutSuccessMessage = document.getElementById('checkoutSuccessMessage');
+            const checkoutSuccessLink = document.getElementById('checkoutSuccessLink');
+
+            let selectedProduto = null;
+
+            function showError(message) {
+                checkoutError.textContent = message;
+                checkoutError.style.display = 'block';
+                checkoutLoading.style.display = 'none';
+                checkoutFormWrapper.style.display = 'none';
+            }
+
+            function hideError() {
+                checkoutError.style.display = 'none';
+            }
+
+            async function loadProdutos() {
+                try {
+                    const res = await fetch('/api/produtos');
+                    const json = await res.json();
+                    if (!json.success || !Array.isArray(json.data) || json.data.length === 0) {
+                        showError('Nenhum template disponível no momento.');
+                        return;
+                    }
+                    return json.data;
+                } catch (err) {
+                    showError('Erro ao carregar produtos. Tente novamente.');
+                    return null;
+                }
+            }
+
+            async function selectProduto(produtos) {
+                if (produtoParam) {
+                    const decoded = decodeURIComponent(produtoParam);
+                    selectedProduto = produtos.find(p => p.id === decoded || p.nome.toLowerCase() === decoded.toLowerCase());
+                }
+                if (!selectedProduto && produtos.length > 0) {
+                    selectedProduto = produtos[0];
+                }
+                if (!selectedProduto) {
+                    showError('Produto não encontrado.');
+                    return;
+                }
+                renderProduto(selectedProduto);
+            }
+
+            function renderProduto(produto) {
+                checkoutProduct.style.display = 'flex';
+                checkoutProductName.textContent = produto.nome;
+                checkoutProductDesc.textContent = produto.descricao;
+                checkoutProductPrice.textContent = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(produto.preco));
+                checkoutProductIcon.innerHTML = produto.imagem_url ? `<img src="${produto.imagem_url}" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:12px;">` : getDefaultIcon();
+                checkoutLoading.style.display = 'none';
+                checkoutFormWrapper.style.display = 'block';
+            }
+
+            function getDefaultIcon() {
+                return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>';
+            }
+
+            checkoutForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                hideError();
+                checkoutSubmitBtn.disabled = true;
+                checkoutSubmitBtn.textContent = 'Enviando...';
+
+                const payload = {
+                    nome_cliente: document.getElementById('nome').value.trim(),
+                    email_cliente: document.getElementById('email').value.trim(),
+                    whatsapp: document.getElementById('whatsapp').value.trim(),
+                    produto_id: selectedProduto.id,
+                    produto_nome: selectedProduto.nome,
+                    produto_preco: selectedProduto.preco,
+                    observacoes: document.getElementById('observacoes').value.trim()
+                };
+
+                try {
+                    const res = await fetch('/api/pedidos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const json = await res.json();
+                    if (!json.success || !json.data) {
+                        throw new Error(json.error || 'Erro ao criar pedido');
+                    }
+                    checkoutFormWrapper.style.display = 'none';
+                    checkoutProduct.style.display = 'none';
+                    checkoutSuccess.style.display = 'block';
+                    checkoutSuccessMessage.textContent = `Recebemos seu pedido de "${selectedProduto.nome}". Em breve entraremos em contato pelo WhatsApp ou email.`;
+                    checkoutSuccessLink.href = `/pedido.html?id=${json.data.id}`;
+                } catch (err) {
+                    showError(err.message || 'Erro ao processar pedido. Tente novamente.');
+                    checkoutSubmitBtn.disabled = false;
+                    checkoutSubmitBtn.textContent = 'Solicitar Template';
+                }
+            });
+
+            async function init() {
+                const produtos = await loadProdutos();
+                if (produtos) {
+                    await selectProduto(produtos);
+                }
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>

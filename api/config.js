@@ -11,12 +11,9 @@
  * Versão: 1.0.0
  */
 
-import { createClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
 import { corsHeaders, handleOptions } from './_lib/cors.js';
-
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
+import { supabasePublic, supabaseAdmin } from './_lib/supabase.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
@@ -26,8 +23,6 @@ if (!JWT_SECRET) {
     'A API recusou iniciar por segurança — sem fallback hardcoded.'
   );
 }
-
-const supabase = createClient(supabaseUrl || '', supabaseKey || '');
 
 const ENDPOINT_METHODS = 'GET, PUT, OPTIONS';
 
@@ -47,7 +42,7 @@ function verifyToken(req) {
 
 /** GET — Retorna configurações */
 export async function GET(req) {
-  const { data, error } = await supabase
+  const { data, error } = await supabasePublic
     .from('config')
     .select('chave, valor');
 
@@ -85,7 +80,7 @@ export async function PUT(req) {
 
     for (const [key, value] of Object.entries(body)) {
       const sanitized = String(value).trim();
-      const { error } = await supabase
+      const { error } = await supabaseAdmin
         .from('config')
         .upsert(
           { chave: key, valor: sanitized, updated_at: new Date().toISOString() },
