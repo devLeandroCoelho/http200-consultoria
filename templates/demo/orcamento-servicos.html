@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo — Orçamento de Serviços</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f8fafc; color: #0f172a; }
+    .header { background: #0f172a; color: #fff; padding: 16px; text-align: center; }
+    .header small { opacity: .7; font-size: 12px; }
+    .container { max-width: 720px; margin: 24px auto; padding: 0 16px; }
+    .paper { background: #fff; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb; }
+    .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #e5e7eb; }
+    .total { font-weight: bold; font-size: 18px; color: #b45309; }
+    .actions { margin-top: 16px; display: flex; gap: 8px; }
+    .btn { flex: 1; padding: 12px; border-radius: 10px; border: none; background: #2563eb; color: #fff; font-weight: bold; cursor: pointer; }
+    .btn.secondary { background: #fff; color: #2563eb; border: 1px solid #2563eb; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Orçamento de Serviços</h1>
+    <small>Demo interativa — este é um exemplo do template</small>
+  </div>
+  <div class="container">
+    <div class="paper">
+      <h2>Orçamento #DEMO-001</h2>
+      <p style="color:#6b7280; margin-top:4px;">Desenvolvimento de site institucional</p>
+      <div class="row"><span>Design</span><span>R$ 1.200,00</span></div>
+      <div class="row"><span>Frontend</span><span>R$ 2.400,00</span></div>
+      <div class="row"><span>Backend</span><span>R$ 2.100,00</span></div>
+      <div class="row"><span>SEO básico</span><span>R$ 600,00</span></div>
+      <div class="row total"><span>Total</span><span>R$ 6.300,00</span></div>
+      <div class="actions">
+        <button class="btn">Baixar PDF</button>
+        <button class="btn secondary">Enviar por email</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

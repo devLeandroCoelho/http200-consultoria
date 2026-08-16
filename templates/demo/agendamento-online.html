@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo — Agendamento Online</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f8fafc; color: #0f172a; }
+    .header { background: #0f172a; color: #fff; padding: 16px; text-align: center; }
+    .header small { opacity: .7; font-size: 12px; }
+    .container { max-width: 720px; margin: 24px auto; padding: 0 16px; }
+    .slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 12px; }
+    .slot { padding: 12px; border-radius: 10px; border: 1px solid #e5e7eb; background: #fff; text-align: center; cursor: pointer; }
+    .slot.selected { background: #f97316; color: #fff; border-color: #f97316; }
+    .cta { margin-top: 16px; width: 100%; padding: 14px; border-radius: 12px; border: none; background: #22c55e; color: #fff; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Agendamento Online</h1>
+    <small>Demo interativa — este é um exemplo do template</small>
+  </div>
+  <div class="container">
+    <h2>Escolha um horário</h2>
+    <div class="slots">
+      <button class="slot">09:00</button>
+      <button class="slot selected">10:00</button>
+      <button class="slot">11:00</button>
+      <button class="slot">14:00</button>
+      <button class="slot">15:00</button>
+      <button class="slot">16:00</button>
+    </div>
+    <button class="cta">Confirmar Agendamento</button>
+  </div>
+</body>
+</html>
