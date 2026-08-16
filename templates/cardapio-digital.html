@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<!--
+  ============================================
+  HTTP200.TI — Template: Cardápio Digital
+  ============================================
+  Landing page de vendas para o template
+  Cardápio Digital para restaurantes/padarias.
+  
+  Autor: Leandro Coelho
+  Email: http200.ti@gmail.com
+  Versão: 1.0.0
+  Data: 2026-08-16
+  ============================================
+-->
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Template Cardápio Digital para restaurantes e padarias. QR Code por mesa, pedidos via WhatsApp, atualização em tempo real.">
+    <meta name="keywords" content="cardápio digital, template restaurante, template padaria, QR Code, pedidos WhatsApp, cardápio online">
+    <meta name="author" content="HTTP200.TI">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Cardápio Digital — Template HTTP200.TI">
+    <meta property="og:description" content="Template Cardápio Digital para restaurantes e padarias. QR Code por mesa, pedidos via WhatsApp, atualização em tempo real.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://http200.ti/templates/cardapio-digital.html">
+    <meta property="og:locale" content="pt_BR">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Cardápio Digital — Template HTTP200.TI">
+    <meta name="twitter:description" content="Template Cardápio Digital para restaurantes e padarias.">
+
+    <title>Cardápio Digital — Template HTTP200.TI</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖥️</text></svg>">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <!-- Loading -->
+    <div class="loading" id="loading" aria-hidden="true">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="navbar" id="navbar" role="banner">
+        <nav class="navbar-container" aria-label="Navegação principal">
+            <a href="../index.html" class="navbar-logo" aria-label="HTTP200.TI — Ir para o início">
+                <span class="logo-bracket">&lt;</span>HTTP200<span class="logo-dot">.</span>TI<span class="logo-bracket">/&gt;</span>
+            </a>
+
+            <ul class="navbar-links" id="navLinks" role="menubar">
+                <li role="none"><a href="#problema" role="menuitem" class="nav-link">Problema</a></li>
+                <li role="none"><a href="#solucao" role="menuitem" class="nav-link">Solução</a></li>
+                <li role="none"><a href="#features" role="menuitem" class="nav-link">Features</a></li>
+                <li role="none"><a href="#preco" role="menuitem" class="nav-link">Preço</a></li>
+                <li role="none"><a href="#faq" role="menuitem" class="nav-link">FAQ</a></li>
+            </ul>
+
+            <a href="/checkout.html?produto=cardapio-digital" class="navbar-cta" aria-label="Comprar Cardápio Digital">Comprar Agora</a>
+
+            <button
+                class="navbar-toggle"
+                id="navToggle"
+                aria-label="Abrir menu de navegação"
+                aria-expanded="false"
+                aria-controls="navLinks"
+            >
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero" id="hero" aria-label="Seção principal">
+            <div class="hero-bg">
+                <canvas id="particleCanvas" aria-hidden="true"></canvas>
+                <div class="hero-gradient" aria-hidden="true"></div>
+            </div>
+
+            <div class="hero-content">
+                <p class="hero-badge" aria-hidden="true">
+                    <span class="badge-dot"></span>
+                    Template Digital
+                </p>
+                <h1 class="hero-title">
+                    Cardápio Digital
+                </h1>
+                <p class="hero-subtitle">
+                    O template que transforma a experiência do seu cliente e moderniza seu restaurante ou padaria.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#preco" class="btn btn-outline" aria-label="Ver preço do template">
+                        <span>Ver Preço</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </a>
+                    <a href="/checkout.html?produto=cardapio-digital" class="btn btn-primary" aria-label="Comprar Cardápio Digital agora">
+                        <span>Comprar Agora</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <a href="#problema" class="scroll-indicator" aria-label="Rolar para baixo">
+                <div class="scroll-mouse" aria-hidden="true">
+                    <div class="scroll-wheel"></div>
+                </div>
+                <span class="scroll-text">Scroll</span>
+            </a>
+        </section>
+
+        <!-- Problema -->
+        <section class="services" id="problema" aria-labelledby="problema-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">O problema</span>
+                    <h2 class="section-title" id="problema-title">
+                        Seu cliente ainda lê um <span class="text-accent">PDF</span>?
+                    </h2>
+                    <p class="section-subtitle">
+                        Você atualiza o cardápio toda semana? Se sim, está na hora de mudar.
+                    </p>
+                </div>
+
+                <div class="services-grid">
+                    <article class="product-card" tabindex="0">
+                        <div class="product-icon" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="6" y="6" width="36" height="36" rx="4"/>
+                                <path d="M14 18h20M14 24h20M14 30h12"/>
+                                <circle cx="34" cy="30" r="4"/>
+                            </svg>
+                        </div>
+                        <h3 class="product-title">Cardápio desatualizado</h3>
+                        <p class="product-desc">
+                            PDFs impressos ou arquivos estáticos são rápidos de enviar, mas impossíveis de manter atualizados. Seus clientes veem preços e itens que já não existem.
+                        </p>
+                    </article>
+
+                    <article class="product-card" tabindex="0">
+                        <div class="product-icon" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M24 4l4 8h9l-7 6 3 9-9-5-9 5 3-9-7-6h9z"/>
+                                <path d="M12 32h24M14 40h20"/>
+                            </svg>
+                        </div>
+                        <h3 class="product-title">Baixa conversão</h3>
+                        <p class="product-desc">
+                            Um cardápio pouco atraente ou difícil de ler reduz o ticket médio. Seus clientes não encontram o que querem e desistem.
+                        </p>
+                    </article>
+
+                    <article class="product-card" tabindex="0">
+                        <div class="product-icon" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="24" cy="24" r="18"/>
+                                <path d="M24 12v12l8 4"/>
+                                <path d="M36 36l4 4M12 36l-4 4"/>
+                            </svg>
+                        </div>
+                        <h3 class="product-title">Trabalho repetitivo</h3>
+                        <p class="product-desc">
+                            Atualizar preços, adicionar itens ou reorganizar categorias toda semana consome tempo que poderia ser investido no atendimento.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Solução -->
+        <section class="about" id="solucao" aria-labelledby="solucao-title">
+            <div class="container">
+                <div class="about-grid">
+                    <div class="about-content">
+                        <span class="section-tag">A solução</span>
+                        <h2 class="section-title" id="solucao-title">
+                            Um cardápio digital <span class="text-accent">profissional</span>
+                        </h2>
+                        <p class="about-text">
+                            Um cardápio digital profissional, atualizável em tempo real, com QR Code por mesa, integração com WhatsApp e pedidos diretos.
+                        </p>
+                        <p class="about-text">
+                            Seu cliente acessa o cardápio pelo celular, visualiza fotos dos pratos, confere preços atualizados e pede diretamente pelo WhatsApp — sem precisar baixar apps ou lidar com PDFs.
+                        </p>
+                        <div class="about-signature">
+                            <div class="signature-line"></div>
+                            <span>HTTP200.TI</span>
+                        </div>
+                    </div>
+
+                    <div class="about-stats" aria-label="Benefícios do template">
+                        <div class="stat-card" data-target="100">
+                            <span class="stat-number" aria-hidden="true">0</span>
+                            <span class="stat-suffix" aria-hidden="true">%</span>
+                            <span class="sr-only">Atualizável em tempo real</span>
+                            <span class="stat-label">Atualizável em Tempo Real</span>
+                        </div>
+                        <div class="stat-card" data-target="24">
+                            <span class="stat-number" aria-hidden="true">0</span>
+                            <span class="stat-suffix" aria-hidden="true">/7</span>
+                            <span class="sr-only">Disponível 24 horas por dia</span>
+                            <span class="stat-label">Disponível 24/7</span>
+                        </div>
+                        <div class="stat-card" data-target="0">
+                            <span class="stat-number" aria-hidden="true">0</span>
+                            <span class="stat-suffix" aria-hidden="true"></span>
+                            <span class="sr-only">Sem necessidade de download</span>
+                            <span class="stat-label">Sem Download</span>
+                        </div>
+                        <div class="stat-card stat-card-highlight">
+                            <span class="stat-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                                    <path d="M22 4L12 13 2 4"/>
+                                </svg>
+                            </span>
+                            <span class="stat-label">Pedidos via WhatsApp</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="differentials" id="features" aria-labelledby="features-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Funcionalidades</span>
+                    <h2 class="section-title" id="features-title">
+                        Tudo que você precisa em um <span class="text-accent">cardápio digital</span>
+                    </h2>
+                </div>
+
+                <div class="diff-grid">
+                    <article class="diff-card" tabindex="0">
+                        <div class="diff-icon" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="6" y="6" width="36" height="36" rx="4"/>
+                                <path d="M14 18h20M14 24h20M14 30h12"/>
+                                <circle cx="34" cy="30" r="4"/>
+                            </svg>
+                        </div>
+                        <h3 class="diff-title">QR Code por Mesa</h3>
+                        <p class="diff-desc">
+                            Cada mesa tem seu QR Code. O cliente escaneia e acessa o cardápio instantaneamente, sem senhas ou cadastros.
+                        </p>
+                    </article>
+
+                    <article class="diff-card" tabindex="0">
+                        <div class="diff-icon" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="24" cy="24" r="18"/>
+                                <path d="M24 12v12l8 4"/>
+                                <path d="M36 36l4 4M12 36l-4 4"/>
+                            </svg>
+                        </div>
+                        <h3 class="diff-title">Categorias e Filtros</h3>
+                        <p class="diff-desc">
+                            Organize seu cardápio em categorias (bebidas, pratos quentes, sobremesas, etc.) e permita que o cliente filtre rapidamente.
+                        </p>
+                    </article>
+
+                    <article class="diff-card" tabindex="0">
+                        <div class="diff-icon" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 36V12a4 4 0 014-4h24a4 4 0 014 4v16a4 4 0 01-4 4H16l-8 8z"/>
+                                <path d="M16 20h16M16 26h10"/>
+                            </svg>
+                        </div>
+                        <h3 class="diff-title">Preços Atualizáveis</h3>
+                        <p class="diff-desc">
+                            Altere preços e itens em tempo real pelo painel administrativo. Sem precisar republicar o site.
+                        </p>
+                    </article>
+
+                    <article class="diff-card" tabindex="0">
+                        <div class="diff-icon" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="4" y="6" width="40" height="32" rx="4"/>
+                                <path d="M4 14h40"/>
+                                <circle cx="10" cy="10" r="2"/>
+                                <circle cx="16" cy="10" r="2"/>
+                                <circle cx="22" cy="10" r="2"/>
+                            </svg>
+                        </div>
+                        <h3 class="diff-title">Integração WhatsApp</h3>
+                        <p class="diff-desc">
+                            Pedidos são enviados diretamente para o WhatsApp do estabelecimento. Sem comissões, sem apps intermediários.
+                        </p>
+                    </article>
+
+                    <article class="diff-card" tabindex="0">
+                        <div class="diff-icon" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="6" y="6" width="36" height="36" rx="4"/>
+                                <path d="M18 18h6v6h-6zM18 30h12"/>
+                                <circle cx="24" cy="24" r="2" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <h3 class="diff-title">Design Responsivo</h3>
+                        <p class="diff-desc">
+                            Funciona perfeitamente em celulares, tablets e desktops. Seu cliente tem a melhor experiência em qualquer tela.
+                        </p>
+                    </article>
+
+                    <article class="diff-card" tabindex="0">
+                        <div class="diff-icon" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M24 4v40M4 24h40"/>
+                                <path d="M8 8l32 32M40 8L8 40"/>
+                                <circle cx="24" cy="24" r="6" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <h3 class="diff-title">Analytics de Visualizações</h3>
+                        <p class="diff-desc">
+                            Acompanhe quantas pessoas visualizaram cada item, quantos QR Codes foram escaneados e quais pratos são mais buscados.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Preço -->
+        <section class="products" id="preco" aria-labelledby="preco-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Investimento</span>
+                    <h2 class="section-title" id="preco-title">
+                        Um preço justo para um template <span class="text-accent">completo</span>
+                    </h2>
+                    <p class="section-subtitle">
+                        Acesso imediato após a confirmação do pagamento. Sem mensalidades.
+                    </p>
+                </div>
+
+                <div class="products-grid">
+                    <article class="product-card" style="border-color: var(--secondary); max-width: 500px; margin: 0 auto; width: 100%;">
+                        <div class="product-icon" aria-hidden="true" style="background: rgba(var(--secondary-rgb), 0.1);">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="6" y="6" width="36" height="36" rx="4"/>
+                                <path d="M14 18h20M14 24h20M14 30h12"/>
+                                <circle cx="34" cy="30" r="4"/>
+                            </svg>
+                        </div>
+                        <h3 class="product-title">Cardápio Digital</h3>
+                        <p class="product-desc">
+                            Template completo com painel administrativo, QR Code gerado automaticamente, integração WhatsApp e design responsivo.
+                        </p>
+                        <div style="margin: 1.5rem 0; text-align: center;">
+                            <span style="font-size: 3rem; font-weight: 800; color: var(--text); line-height: 1;">R$ 97</span>
+                            <span style="font-size: 1.1rem; color: var(--text-secondary); display: block; margin-top: 0.25rem;">pagamento único</span>
+                        </div>
+                        <a href="/checkout.html?produto=cardapio-digital" class="btn btn-primary" style="width: 100%; justify-content: center; max-width: none;">
+                            <span>Comprar Agora</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                        <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">
+                            Pagamento seguro · Acesso imediato · Suporte incluso
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="about" id="faq" aria-labelledby="faq-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Dúvidas frequentes</span>
+                    <h2 class="section-title" id="faq-title">
+                        Perguntas <span class="text-accent">frequentes</span>
+                    </h2>
+                </div>
+
+                <div class="services-grid" style="max-width: 800px; margin: 0 auto;">
+                    <article class="product-card" style="text-align: left;" tabindex="0">
+                        <h3 class="product-title" style="font-size: 1.1rem; margin-bottom: 0.75rem;">Preciso ter conhecimento técnico para usar?</h3>
+                        <p class="product-desc">
+                            Não. O template vem com painel administrativo intuitivo onde você cadastra itens, atualiza preços e imprime QR Codes sem precisar programar.
+                        </p>
+                    </article>
+
+                    <article class="product-card" style="text-align: left;" tabindex="0">
+                        <h3 class="product-title" style="font-size: 1.1rem; margin-bottom: 0.75rem;">Posso personalizar cores e logo?</h3>
+                        <p class="product-desc">
+                            Sim. O template permite personalizar cores, logo, fontes e layout facilmente. Você pode deixar o cardápio com a identidade visual do seu negócio.
+                        </p>
+                    </article>
+
+                    <article class="product-card" style="text-align: left;" tabindex="0">
+                        <h3 class="product-title" style="font-size: 1.1rem; margin-bottom: 0.75rem;">Como funciona a integração com WhatsApp?</h3>
+                        <p class="product-desc">
+                            Quando o cliente finaliza o pedido, o template gera uma mensagem formatada e abre o WhatsApp do estabelecimento automaticamente, com todos os itens e observações.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Final -->
+        <section class="cta-section" id="contato" aria-labelledby="cta-title">
+            <div class="cta-bg" aria-hidden="true"></div>
+            <div class="container">
+                <div class="cta-content">
+                    <h2 class="cta-title" id="cta-title">
+                        Pronto para modernizar<br>seu cardápio?
+                    </h2>
+                    <p class="cta-subtitle">
+                        Garanta agora o template e surpreenda seus clientes
+                    </p>
+                    <a href="/checkout.html?produto=cardapio-digital" class="btn btn-cta" aria-label="Comprar Cardápio Digital por R$ 97">
+                        <span>Quero o Cardápio Digital</span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="../index.html" class="footer-logo" aria-label="HTTP200.TI — Voltar ao início">
+                        <span class="logo-bracket">&lt;</span>HTTP200<span class="logo-dot">.</span>TI<span class="logo-bracket">/&gt;</span>
+                    </a>
+                    <p class="footer-tagline">
+                        Soluções que conectam tecnologia ao resultado.
+                    </p>
+                </div>
+
+                <div class="footer-links">
+                    <h3 class="footer-heading">Navegação</h3>
+                    <ul>
+                        <li><a href="#problema">Problema</a></li>
+                        <li><a href="#solucao">Solução</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#preco">Preço</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-links">
+                    <h3 class="footer-heading">Templates</h3>
+                    <ul>
+                        <li><a href="cardapio-digital.html">Cardápio Digital</a></li>
+                        <li><a href="../index.html#produtos">Outros Templates</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-contact">
+                    <h3 class="footer-heading">Contato</h3>
+                    <ul>
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                                <path d="M22 4L12 13 2 4"/>
+                            </svg>
+                            <a href="mailto:http200.ti@gmail.com">http200.ti@gmail.com</a>
+                        </li>
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                                <circle cx="12" cy="10" r="3"/>
+                            </svg>
+                            <span>Brasil — Atendimento Remoto</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 HTTP200.TI — Todos os direitos reservados</p>
+                <p class="footer-credits">
+                    Desenvolvido com <span class="heart" aria-label="amor">♥</span> e <span class="text-accent">&lt;código/&gt;</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botão Voltar ao Topo -->
+    <button
+        class="back-to-top"
+        id="backToTop"
+        aria-label="Voltar ao topo da página"
+        title="Voltar ao topo"
+    >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M18 15l-6-6-6 6"/>
+        </svg>
+    </button>
+
+    <script src="../script.js"></script>
+</body>
+</html>

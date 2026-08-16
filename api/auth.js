@@ -1,20 +1,21 @@
 /**
  * HTTP200.TI Consultoria — Autenticação
  * 
- * Gerencia login e verificação de token JWT.
+ * Gerencia login, verificação de sessão e logout via cookie httpOnly.
  * 
  * Rotas:
- *   POST /api/auth — Login (retorna token JWT)
- *   GET /api/auth — Verifica se token é válido
+ *   POST /api/auth — Login (define cookie httpOnly)
+ *   GET /api/auth — Verifica se sessão é válida (via cookie)
+ *   DELETE /api/auth — Logout (limpa cookie)
  * 
  * Autor: Leandro Coelho — http200.ti@gmail.com
  * Versão: 1.0.0
  */
 
 import jwt from 'jsonwebtoken';
-import { corsHeaders, handleOptions } from './_lib/cors.js';
+import { corsHeaders, handleOptions, isAllowedOrigin } from './_lib/cors.js';
 
-const AUTH_METHODS = 'GET, POST, OPTIONS';
+const AUTH_METHODS = 'GET, POST, DELETE, OPTIONS';
 
 const SECRET = process.env.JWT_SECRET;
 if (!SECRET) {
@@ -25,15 +26,44 @@ if (!SECRET) {
   );
 }
 
+const COOKIE_NAME = 'admin_token';
+const COOKIE_OPTIONS = [
+  'HttpOnly',
+  'Secure',
+  'SameSite=Lax',
+  'Path=/',
+  'Max-Age=86400',
+].join('; ');
+
+function parseCookie(cookieHeader) {
+  if (!cookieHeader) return {};
+  return cookieHeader.split(';').reduce((acc, part) => {
+    const [k, ...v] = part.trim().split('=');
+    if (k) acc[k] = decodeURIComponent(v.join('='));
+    return acc;
+  }, {});
+}
+
+function getCookieValue(req, name) {
+  const cookies = parseCookie(req.headers.get('cookie') || '');
+  return cookies[name] || null;
+}
+
+function buildSetCookie(token) {
+  return `${COOKIE_NAME}=${token}; ${COOKIE_OPTIONS}`;
+}
+
+function buildClearCookie() {
+  return `${COOKIE_NAME}=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0`;
+}
+
 /**
  * Verifica se um token JWT é válido
- * @param {Request} req - Requisição HTTP com header Authorization
+ * @param {string|null} token
  * @returns {Object|null} Payload do token ou null se inválido
  */
-function verifyToken(req) {
-  const auth = req.headers.get('authorization');
-  if (!auth || !auth.startsWith('Bearer ')) return null;
-  const token = auth.split(' ')[1];
+function verifyJwt(token) {
+  if (!token) return null;
   try {
     return jwt.verify(token, SECRET);
   } catch {
@@ -41,13 +71,25 @@ function verifyToken(req) {
   }
 }
 
-/** GET — Verificar token existente */
+function corsResponse(body, status, extraHeaders = {}) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+      ...corsHeaders(null, AUTH_METHODS),
+      ...extraHeaders,
+    },
+  });
+}
+
+/** GET — Verificar sessão via cookie */
 export async function GET(req) {
   try {
-    const decoded = verifyToken(req);
+    const token = getCookieValue(req, COOKIE_NAME);
+    const decoded = verifyJwt(token);
     if (!decoded) {
       return new Response(
-        JSON.stringify({ success: false, valid: false, error: 'Token inválido ou expirado' }),
+        JSON.stringify({ success: false, valid: false, error: 'Sessão inválida ou expirada' }),
         { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, AUTH_METHODS) } }
       );
     }
@@ -74,10 +116,7 @@ export async function POST(req) {
     const { usuario, senha } = body;
 
     if (!usuario || !senha) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Usuário e senha são obrigatórios' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, AUTH_METHODS) } }
-      );
+      return corsResponse({ success: false, error: 'Usuário e senha são obrigatórios' }, 400);
     }
 
     const userSanitized = String(usuario).trim();
@@ -87,17 +126,11 @@ export async function POST(req) {
 
     if (!validUser || !validPass) {
       console.error('ADMIN_USER ou ADMIN_PASS não configurados');
-      return new Response(
-        JSON.stringify({ success: false, error: 'Erro de configuração do servidor' }),
-        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, AUTH_METHODS) } }
-      );
+      return corsResponse({ success: false, error: 'Erro de configuração do servidor' }, 500);
     }
 
     if (userSanitized !== validUser || passSanitized !== validPass) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Credenciais inválidas' }),
-        { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, AUTH_METHODS) } }
-      );
+      return corsResponse({ success: false, error: 'Credenciais inválidas' }, 401);
     }
 
     const token = jwt.sign(
@@ -109,16 +142,44 @@ export async function POST(req) {
     return new Response(
       JSON.stringify({
         success: true,
-        data: { token, user: userSanitized, expiresIn: '24h' },
+        data: { user: userSanitized, expiresIn: '24h' },
       }),
-      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, AUTH_METHODS) } }
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders(req, AUTH_METHODS),
+          'Set-Cookie': buildSetCookie(token),
+        },
+      }
     );
   } catch (error) {
     console.error('Erro no login:', error);
+    return corsResponse({ success: false, error: 'Erro interno do servidor' }, 500);
+  }
+}
+
+/** DELETE — Logout */
+export async function DELETE(req) {
+  try {
+    const origin = req.headers.get('origin');
+    const headers = {
+      'Content-Type': 'application/json',
+      ...corsHeaders(req, AUTH_METHODS),
+      'Set-Cookie': buildClearCookie(),
+    };
+
+    if (origin && isAllowedOrigin(origin)) {
+      headers['Access-Control-Allow-Origin'] = origin;
+    }
+
     return new Response(
-      JSON.stringify({ success: false, error: 'Erro interno do servidor' }),
-      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, AUTH_METHODS) } }
+      JSON.stringify({ success: true, message: 'Logout realizado' }),
+      { status: 200, headers }
     );
+  } catch (error) {
+    console.error('Erro no logout:', error);
+    return corsResponse({ success: false, error: 'Erro interno do servidor' }, 500);
   }
 }
 

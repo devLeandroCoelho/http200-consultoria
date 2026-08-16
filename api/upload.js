@@ -5,7 +5,7 @@
  * 
  * Rota: POST /api/upload
  * 
- * Autor: Leandro Coelho — http200.ti@gmail.com
+ * * Autor: Leandro Coelho — http200.ti@gmail.com
  * Versão: 1.0.0
  */
 
@@ -36,6 +36,37 @@ function verifyToken(req) {
 function isValidFileType(filename) {
   const ext = '.' + filename.split('.').pop().toLowerCase();
   return ALLOWED_EXTENSIONS.includes(ext);
+}
+
+function sanitizeSvg(base64Data) {
+  try {
+    let svgString;
+    if (base64Data.includes(',')) {
+      svgString = Buffer.from(base64Data.split(',')[1], 'base64').toString('utf-8');
+    } else {
+      svgString = Buffer.from(base64Data, 'base64').toString('utf-8');
+    }
+
+    let cleaned = svgString;
+
+    cleaned = cleaned.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
+    cleaned = cleaned.replace(/<\s*script\b[^>]*\/>/gi, '');
+
+    cleaned = cleaned.replace(/\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*')/gi, '');
+    cleaned = cleaned.replace(/\s+on\w+\s*=\s*[^\s>]+/gi, '');
+
+    cleaned = cleaned.replace(/<(foreignObject|embed|object|iframe)\b[^>]*>[\s\S]*?<\/\1>/gi, '');
+    cleaned = cleaned.replace(/<\s*(foreignObject|embed|object|iframe)\b[^>]*\/>/gi, '');
+
+    const sanitizedBase64 = Buffer.from(cleaned, 'utf-8').toString('base64');
+
+    if (base64Data.includes(',')) {
+      return base64Data.split(',')[0] + ',' + sanitizedBase64;
+    }
+    return sanitizedBase64;
+  } catch {
+    return null;
+  }
 }
 
 /** POST — Upload de imagem */
@@ -75,8 +106,20 @@ export async function POST(req) {
       );
     }
 
+    let processedData = data;
+    if (filename.toLowerCase().endsWith('.svg')) {
+      const sanitized = sanitizeSvg(base64Data);
+      if (!sanitized) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'SVG inválido ou não sanitizado' }),
+          { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
+        );
+      }
+      processedData = sanitized;
+    }
+
     return new Response(
-      JSON.stringify({ success: true, data: { url: data, filename } }),
+      JSON.stringify({ success: true, data: { url: processedData, filename } }),
       { status: 201, headers: { 'Content-Type': 'application/json', ...corsHeaders(req, ENDPOINT_METHODS) } }
     );
   } catch (error) {

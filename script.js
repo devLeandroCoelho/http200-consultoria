@@ -165,7 +165,7 @@
     // --- Scroll Reveal (Intersection Observer) ---
     function initScrollReveal() {
         const revealElements = document.querySelectorAll(
-            '.service-card, .stat-card, .diff-card, .about-content, .about-stats, .cta-content, .section-header'
+            '.service-card, .product-card, .stat-card, .diff-card, .about-content, .about-stats, .cta-content, .section-header'
         );
 
         revealElements.forEach(el => el.classList.add('reveal'));
@@ -430,7 +430,7 @@
 
     // --- Service Card Hover Sound (optional subtle feedback) ---
     function initHoverFeedback() {
-        const cards = document.querySelectorAll('.service-card, .diff-card, .stat-card');
+        const cards = document.querySelectorAll('.service-card, .diff-card, .stat-card, .product-card');
 
         cards.forEach(card => {
             card.addEventListener('mouseenter', () => {

@@ -272,7 +272,6 @@
           return;
         }
 
-        localStorage.setItem('admin_token', data.data.token);
         window.location.href = '/admin.html';
       } catch (err) {
         showError('Erro de conexão. Tente novamente.');
@@ -281,9 +280,12 @@
     });
 
     // Se já estiver logado, redireciona
-    if (localStorage.getItem('admin_token')) {
-      window.location.href = '/admin.html';
-    }
+    (async () => {
+      const res = await fetch('/api/auth');
+      if (res.ok) {
+        window.location.href = '/admin.html';
+      }
+    })();
   </script>
 </body>
 </html>
