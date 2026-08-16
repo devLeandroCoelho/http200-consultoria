@@ -4,29 +4,49 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Demo — Gestão de Clientes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; background: #f8fafc; color: #0f172a; }
-    .header { background: #0f172a; color: #fff; padding: 16px; text-align: center; }
-    .header small { opacity: .7; font-size: 12px; }
-    .container { max-width: 800px; margin: 24px auto; padding: 0 16px; }
-    .card { background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #e5e7eb; }
-    .row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #e5e7eb; }
-    .tag { padding: 4px 8px; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-size: 12px; }
+    body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: #0f172a; }
+    .navbar { background: #0f172a; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+    .navbar h1 { font-size: 18px; font-weight: 700; }
+    .badge { background: #f97316; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; padding: 16px; max-width: 960px; margin: 0 auto; }
+    .stat { background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #e5e7eb; }
+    .stat strong { font-size: 22px; display: block; }
+    .stat span { font-size: 12px; color: #6b7280; }
+    .container { max-width: 960px; margin: 0 auto; padding: 0 16px 80px; }
+    .card { background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #e5e7eb; margin-top: 12px; }
+    .row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+    .row:last-child { border-bottom: none; }
+    .tag { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+    .tag.vip { background: #fef3c7; color: #92400e; }
+    .tag.active { background: #dbeafe; color: #1d4ed8; }
+    .tag.new { background: #d1fae5; color: #065f46; }
+    .add-btn { position: fixed; bottom: 16px; right: 16px; width: 52px; height: 52px; border-radius: 50%; background: #f97316; color: #fff; border: none; font-size: 24px; cursor: pointer; box-shadow: 0 6px 20px rgba(249,115,22,.35); }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1>Gestão de Clientes</h1>
-    <small>Demo interativa — este é um exemplo do template</small>
+  <div class="navbar">
+    <h1>👥 Gestão de Clientes</h1>
+    <span class="badge">DEMO</span>
+  </div>
+  <div class="stats">
+    <div class="stat"><strong>1.248</strong><span>Clientes ativos</span></div>
+    <div class="stat"><strong>R$ 84k</strong><span>Receita mensal</span></div>
+    <div class="stat"><strong>32</strong><span>Novos este mês</span></div>
+    <div class="stat"><strong>98%</strong><span>Satisfação</span></div>
   </div>
   <div class="container">
     <div class="card">
-      <h2>Clientes</h2>
-      <div class="row"><span>Maria Souza</span><span class="tag">VIP</span></div>
-      <div class="row"><span>João Lima</span><span class="tag">Ativo</span></div>
-      <div class="row"><span>Ana Pereira</span><span class="tag">Novo</span></div>
+      <h3 style="font-size:16px; margin-bottom:10px;">Clientes</h3>
+      <div class="row"><span>Maria Souza</span><span class="tag vip">VIP</span></div>
+      <div class="row"><span>João Lima</span><span class="tag active">Ativo</span></div>
+      <div class="row"><span>Ana Pereira</span><span class="tag new">Novo</span></div>
+      <div class="row"><span>Carlos Souza</span><span class="tag active">Ativo</span></div>
     </div>
   </div>
+  <button class="add-btn">+</button>
 </body>
 </html>
