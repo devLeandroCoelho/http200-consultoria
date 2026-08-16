@@ -126,7 +126,7 @@ describe('GET /api/auth — validação de token', () => {
     expect(res.status).toBe(401);
     const json = await res.json();
     expect(json.valid).toBe(false);
-    expect(json.error).toBe('Token inválido ou expirado');
+    expect(json.error).toBe('Sessão inválida ou expirada');
   });
 
   it('retorna 401 com cookie malformado', async () => {
