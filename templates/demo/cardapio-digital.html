@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo — Cardápio Digital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #0f172a; }
+    .navbar { background: #0f172a; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+    .navbar h1 { font-size: 18px; font-weight: 700; }
+    .navbar .badge { background: #f97316; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .hero { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; padding: 32px 16px; text-align: center; }
+    .hero h2 { font-size: 26px; margin-bottom: 6px; }
+    .hero p { opacity: .9; font-size: 14px; }
+    .categories { display: flex; gap: 8px; padding: 12px 16px; overflow-x: auto; background: #fff; border-bottom: 1px solid #e5e7eb; position: sticky; top: 48px; z-index: 9; }
+    .cat { padding: 8px 14px; border-radius: 999px; border: 1px solid #e5e7eb; background: #fff; font-size: 13px; cursor: pointer; white-space: nowrap; font-weight: 500; }
+    .cat.active { background: #f97316; color: #fff; border-color: #f97316; }
+    .menu { max-width: 640px; margin: 0 auto; padding: 16px; display: grid; gap: 12px; padding-bottom: 90px; }
+    .item { display: flex; justify-content: space-between; align-items: center; padding: 14px; border-radius: 12px; border: 1px solid #e5e7eb; background: #fff; transition: all .2s; }
+    .item:hover { border-color: #f97316; box-shadow: 0 4px 20px rgba(249,115,22,.12); }
+    .item-info h3 { font-size: 15px; font-weight: 600; }
+    .item-info p { font-size: 12px; color: #6b7280; margin-top: 3px; }
+    .price { font-weight: 700; color: #b45309; font-size: 15px; }
+    .cta { position: fixed; bottom: 14px; left: 14px; right: 14px; background: #22c55e; color: #fff; padding: 14px; border-radius: 12px; text-align: center; text-decoration: none; font-weight: 600; font-size: 15px; box-shadow: 0 4px 20px rgba(34,197,94,.35); }
+    .whatsapp-float { position: fixed; bottom: 80px; right: 14px; width: 48px; height: 48px; background: #25d366; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,.2); }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>🍔 Hamburgueria Demo</h1>
+    <span class="badge">DEMO</span>
+  </div>
+  <div class="hero">
+    <h2>Nosso Cardápio</h2>
+    <p>Escolha seus favoritos e peça pelo WhatsApp</p>
+  </div>
+  <div class="categories">
+    <button class="cat active" onclick="filter(this,'all')">Todos</button>
+    <button class="cat" onclick="filter(this,'burger')">Hambúrgueres</button>
+    <button class="cat" onclick="filter(this,'drink')">Bebidas</button>
+    <button class="cat" onclick="filter(this,'dessert')">Sobremesas</button>
+  </div>
+  <div class="menu" id="menu">
+    <div class="item" data-cat="burger">
+      <div class="item-info"><h3>X-Burger Especial</h3><p>Pão brioche, carne 180g, queijo, bacon</p></div>
+      <div class="price">R$ 24,90</div>
+    </div>
+    <div class="item" data-cat="burger">
+      <div class="item-info"><h3>X-Bacon</h3><p>Pão, carne, queijo, bacon crocante</p></div>
+      <div class="price">R$ 22,00</div>
+    </div>
+    <div class="item" data-cat="drink">
+      <div class="item-info"><h3>Refrigerante Lata</h3><p>Coca, Guaraná ou Sprite</p></div>
+      <div class="price">R$ 6,00</div>
+    </div>
+    <div class="item" data-cat="dessert">
+      <div class="item-info"><h3>Sobremesa do Dia</h3><p>Pudim ou sorvete artesanal</p></div>
+      <div class="price">R$ 12,00</div>
+    </div>
+  </div>
+  <a class="whatsapp-float" href="https://wa.me/5500000000000" target="_blank">💬</a>
+  <a class="cta" href="https://wa.me/5500000000000?text=Olá! Gostaria de fazer um pedido." target="_blank">Pedir pelo WhatsApp</a>
+  <script>
+    function filter(btn, cat) {
+      document.querySelectorAll('.cat').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.item').forEach(el => el.style.display = (cat === 'all' || el.dataset.cat === cat) ? 'flex' : 'none');
+    }
+  </script>
+</body>
+</html>

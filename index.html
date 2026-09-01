@@ -38,6 +38,52 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖥️</text></svg>">
 
+    <style>
+      .products-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-top: 32px; }
+      .product-card {
+        background: #fff; border-radius: 16px; padding: 0; border: 1px solid #e2e8f0;
+        transition: all .3s; display: flex; flex-direction: column; overflow: hidden;
+      }
+      .product-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,.08); border-color: #f97316; }
+      .product-thumb { background: #f8fafc; padding: 20px; border-bottom: 1px solid #e5e7eb; }
+      .product-title { font-size: 18px; font-weight: 700; color: #0f172a; margin: 16px 20px 8px; }
+      .product-desc { font-size: 13px; color: #64748b; line-height: 1.6; margin: 0 20px 16px; flex: 1; }
+      .product-card .btn { width: calc(100% - 40px); margin: 0 20px 10px; justify-content: center; }
+      .product-card .btn:last-child { margin-bottom: 20px; }
+
+      .mock-cardapio { background: #fff; border-radius: 10px; border: 1px solid #e5e7eb; overflow: hidden; font-size: 10px; color: #0f172a; }
+      .mock-cardapio-header { background: #0f172a; color: #fff; padding: 8px 10px; font-weight: 700; font-size: 11px; text-align: center; }
+      .mock-cardapio-items { padding: 8px 10px; }
+      .mock-item { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed #e5e7eb; font-size: 10px; }
+      .mock-item:last-child { border-bottom: none; }
+      .mock-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; margin-right: 6px; flex-shrink: 0; }
+      .mock-price { color: #b45309; font-weight: 700; }
+
+      .mock-orcamento { background: #fff; border-radius: 10px; border: 1px solid #e5e7eb; padding: 10px; font-size: 10px; color: #0f172a; }
+      .mock-orcamento-header { font-weight: 700; font-size: 11px; margin-bottom: 8px; color: #2563eb; }
+      .mock-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dashed #e5e7eb; }
+      .mock-orcamento-total { font-weight: 700; font-size: 11px; margin-top: 8px; padding-top: 6px; border-top: 2px solid #0f172a; text-align: right; color: #b45309; }
+
+      .mock-minisite { background: #fff; border-radius: 10px; border: 1px solid #e5e7eb; overflow: hidden; text-align: center; }
+      .mock-minisite-hero { background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff; padding: 12px 8px; font-weight: 800; font-size: 12px; }
+      .mock-minisite-sub { color: #64748b; font-size: 9px; padding: 6px; }
+      .mock-minisite-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 0 8px 10px; }
+      .mock-mini-card { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 4px; font-size: 9px; font-weight: 600; }
+
+      .mock-crm { background: #fff; border-radius: 10px; border: 1px solid #e5e7eb; padding: 10px; font-size: 10px; color: #0f172a; }
+      .mock-crm-header { font-weight: 700; font-size: 11px; margin-bottom: 8px; }
+      .mock-crm-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #f1f5f9; }
+      .mock-crm-row:last-child { border-bottom: none; }
+      .mock-avatar { width: 18px; height: 18px; border-radius: 50%; background: #f97316; margin-right: 6px; flex-shrink: 0; }
+      .mock-tag { background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 999px; font-size: 9px; font-weight: 700; }
+
+      .mock-agenda { background: #fff; border-radius: 10px; border: 1px solid #e5e7eb; padding: 10px; }
+      .mock-agenda-header { font-weight: 700; font-size: 11px; margin-bottom: 8px; text-align: center; }
+      .mock-agenda-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+      .mock-slot { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px; text-align: center; font-size: 10px; font-weight: 600; }
+      .mock-slot.active { background: #f97316; color: #fff; border-color: #f97316; }
+    </style>
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,6 +91,22 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="styles.css">
+    <style>
+      .products-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-top: 32px; }
+      .product-card {
+        background: #fff; border-radius: 16px; padding: 28px; border: 1px solid #e2e8f0;
+        transition: all .3s; display: flex; flex-direction: column; gap: 16px;
+      }
+      .product-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,.08); border-color: #f97316; }
+      .product-icon {
+        width: 56px; height: 56px; background: linear-gradient(135deg, rgba(249,115,22,.1), rgba(249,115,22,.05));
+        color: #f97316; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+      }
+      .product-title { font-size: 20px; font-weight: 700; color: #0f172a; }
+      .product-desc { font-size: 14px; color: #64748b; line-height: 1.6; flex: 1; }
+      .product-card .btn { width: 100%; justify-content: center; }
+      .product-card .btn-secondary { margin-bottom: 8px; }
+    </style>
 </head>
 <body>
     <!-- Loading -->
@@ -291,105 +353,90 @@
 
                 <div class="products-grid">
                     <article class="product-card">
-                        <div class="product-icon" aria-hidden="true">
-                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="6" y="6" width="36" height="36" rx="4"/>
-                                <path d="M14 18h20M14 24h20M14 30h12"/>
-                                <circle cx="34" cy="30" r="4"/>
-                            </svg>
+                        <div class="product-thumb">
+                            <div class="mock-cardapio">
+                                <div class="mock-cardapio-header"></div>
+                                <div class="mock-cardapio-items">
+                                    <div class="mock-item"><span class="mock-dot"></span>X-Burger Especial <span class="mock-price">R$ 24,90</span></div>
+                                    <div class="mock-item"><span class="mock-dot"></span>X-Bacon <span class="mock-price">R$ 22,00</span></div>
+                                    <div class="mock-item"><span class="mock-dot"></span>Refrigerante <span class="mock-price">R$ 6,00</span></div>
+                                </div>
+                            </div>
                         </div>
                         <h3 class="product-title">Cardápio Digital</h3>
-                        <p class="product-desc">
-                            Cardápio digital interativo para restaurantes, bares e lanchonetes. Pedidos via WhatsApp, atualização em tempo real.
-                        </p>
-                        <a href="/checkout.html?produto=Card%C3%A1pio+Digital" class="btn btn-primary">
-                            <span>Adquirir Template</span>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14M12 5l7 7-7 7"/>
-                            </svg>
-                        </a>
+                        <p class="product-desc">Cardápio digital interativo para restaurantes, bares e lanchonetes. Pedidos via WhatsApp, atualização em tempo real.</p>
+                        <a href="/templates/demo/cardapio-digital.html" class="btn btn-secondary" target="_blank" rel="noopener"><span>Ver Demo</span></a>
+                        <a href="/checkout.html?produto=Card%C3%A1pio+Digital" class="btn btn-primary"><span>Adquirir Template</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
                     </article>
 
                     <article class="product-card">
-                        <div class="product-icon" aria-hidden="true">
-                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="6" y="10" width="36" height="28" rx="4"/>
-                                <path d="M14 18h20M14 24h16M14 30h12"/>
-                                <path d="M32 34l4 4"/>
-                            </svg>
+                        <div class="product-thumb">
+                            <div class="mock-orcamento">
+                                <div class="mock-orcamento-header">Orçamento #DEMO-001</div>
+                                <div class="mock-orcamento-items">
+                                    <div class="mock-row"><span>Design UI/UX</span><span>R$ 1.200</span></div>
+                                    <div class="mock-row"><span>Frontend</span><span>R$ 2.400</span></div>
+                                    <div class="mock-row"><span>Backend</span><span>R$ 2.100</span></div>
+                                </div>
+                                <div class="mock-orcamento-total">Total: R$ 6.300,00</div>
+                            </div>
                         </div>
                         <h3 class="product-title">Orçamento de Serviços</h3>
-                        <p class="product-desc">
-                            Template profissional para geração de orçamentos. Automatize propostas e impressione clientes com apresentação elegante.
-                        </p>
-                        <a href="/checkout.html?produto=Orçamento+de+Serviços" class="btn btn-primary">
-                            <span>Adquirir Template</span>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14M12 5l7 7-7 7"/>
-                            </svg>
-                        </a>
+                        <p class="product-desc">Template profissional para geração de orçamentos. Automatize propostas e impressione clientes com apresentação elegante.</p>
+                        <a href="/templates/demo/orcamento-servicos.html" class="btn btn-secondary" target="_blank" rel="noopener"><span>Ver Demo</span></a>
+                        <a href="/checkout.html?produto=Or%C3%A7amento+de+Servi%C3%A7os" class="btn btn-primary"><span>Adquirir Template</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
                     </article>
 
                     <article class="product-card">
-                        <div class="product-icon" aria-hidden="true">
-                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="4" y="6" width="40" height="32" rx="4"/>
-                                <path d="M4 14h40"/>
-                                <circle cx="10" cy="10" r="2"/>
-                                <circle cx="16" cy="10" r="2"/>
-                                <circle cx="22" cy="10" r="2"/>
-                            </svg>
+                        <div class="product-thumb">
+                            <div class="mock-minisite">
+                                <div class="mock-minisite-hero">João Silva</div>
+                                <div class="mock-minisite-sub">Desenvolvedor Freelancer</div>
+                                <div class="mock-minisite-cards">
+                                    <div class="mock-mini-card">Sites</div>
+                                    <div class="mock-mini-card">Landing Pages</div>
+                                    <div class="mock-mini-card">SEO</div>
+                                </div>
+                            </div>
                         </div>
                         <h3 class="product-title">Mini Site Profissional</h3>
-                        <p class="product-desc">
-                            Site one-page moderno e responsivo para profissionais liberais. Presença digital profissional sem complicação.
-                        </p>
-                        <a href="/checkout.html?produto=Mini+Site+Profissional" class="btn btn-primary">
-                            <span>Adquirir Template</span>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14M12 5l7 7-7 7"/>
-                            </svg>
-                        </a>
+                        <p class="product-desc">Site one-page moderno e responsivo para profissionais liberais. Presença digital profissional sem complicação.</p>
+                        <a href="/templates/demo/mini-site-profissional.html" class="btn btn-secondary" target="_blank" rel="noopener"><span>Ver Demo</span></a>
+                        <a href="/checkout.html?produto=Mini+Site+Profissional" class="btn btn-primary"><span>Adquirir Template</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
                     </article>
 
                     <article class="product-card">
-                        <div class="product-icon" aria-hidden="true">
-                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="6" y="6" width="36" height="36" rx="4"/>
-                                <circle cx="18" cy="18" r="4"/>
-                                <path d="M42 30c0 6-12 12-24 12S6 36 6 30s12-8 24-8 24 2 24 8z"/>
-                            </svg>
+                        <div class="product-thumb">
+                            <div class="mock-crm">
+                                <div class="mock-crm-header">Clientes</div>
+                                <div class="mock-crm-items">
+                                    <div class="mock-crm-row"><span class="mock-avatar"></span><span>Maria Souza</span><span class="mock-tag">VIP</span></div>
+                                    <div class="mock-crm-row"><span class="mock-avatar"></span><span>João Lima</span><span class="mock-tag">Ativo</span></div>
+                                </div>
+                            </div>
                         </div>
                         <h3 class="product-title">Gestão de Clientes</h3>
-                        <p class="product-desc">
-                            Painel administrativo para gestão de clientes, histórico de atendimentos e follow-up automatizado.
-                        </p>
-                        <a href="/checkout.html?produto=Gestão+de+Clientes" class="btn btn-primary">
-                            <span>Adquirir Template</span>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14M12 5l7 7-7 7"/>
-                            </svg>
-                        </a>
+                        <p class="product-desc">Painel administrativo para gestão de clientes, histórico de atendimentos e follow-up automatizado.</p>
+                        <a href="/templates/demo/gestao-clientes.html" class="btn btn-secondary" target="_blank" rel="noopener"><span>Ver Demo</span></a>
+                        <a href="/checkout.html?produto=Gest%C3%A3o+de+Clientes" class="btn btn-primary"><span>Adquirir Template</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
                     </article>
 
                     <article class="product-card">
-                        <div class="product-icon" aria-hidden="true">
-                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="6" y="6" width="36" height="36" rx="4"/>
-                                <path d="M18 18h6v6h-6zM18 30h12"/>
-                                <circle cx="24" cy="24" r="2" fill="currentColor"/>
-                            </svg>
+                        <div class="product-thumb">
+                            <div class="mock-agenda">
+                                <div class="mock-agenda-header">Agendamento</div>
+                                <div class="mock-agenda-slots">
+                                    <div class="mock-slot">09:00</div>
+                                    <div class="mock-slot active">10:00</div>
+                                    <div class="mock-slot">11:00</div>
+                                    <div class="mock-slot">14:00</div>
+                                </div>
+                            </div>
                         </div>
                         <h3 class="product-title">Agendamento Online</h3>
-                        <p class="product-desc">
-                            Sistema de agendamento online integrado ao Google Calendar. Clientes agendam sem ligar, você confirma automaticamente.
-                        </p>
-                        <a href="/checkout.html?produto=Agendamento+Online" class="btn btn-primary">
-                            <span>Adquirir Template</span>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14M12 5l7 7-7 7"/>
-                            </svg>
-                        </a>
+                        <p class="product-desc">Sistema de agendamento online integrado ao Google Calendar. Clientes agendam sem ligar, você confirma automaticamente.</p>
+                        <a href="/templates/demo/agendamento-online.html" class="btn btn-secondary" target="_blank" rel="noopener"><span>Ver Demo</span></a>
+                        <a href="/checkout.html?produto=Agendamento+Online" class="btn btn-primary"><span>Adquirir Template</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
                     </article>
                 </div>
             </div>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo — Orçamento de Serviços</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: #0f172a; }
+    .navbar { background: #0f172a; color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+    .navbar h1 { font-size: 18px; font-weight: 700; }
+    .badge { background: #f97316; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .container { max-width: 720px; margin: 24px auto; padding: 0 16px; }
+    .paper { background: #fff; border-radius: 12px; padding: 24px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+    .paper-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    .paper-header h2 { font-size: 22px; }
+    .paper-header p { color: #6b7280; font-size: 13px; margin-top: 4px; }
+    .row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #e5e7eb; font-size: 14px; }
+    .row.total { font-weight: 700; font-size: 18px; color: #b45309; border-bottom: none; margin-top: 8px; padding-top: 12px; border-top: 2px solid #0f172a; }
+    .actions { margin-top: 20px; display: flex; gap: 10px; }
+    .btn { flex: 1; padding: 12px; border-radius: 10px; border: none; background: #2563eb; color: #fff; font-weight: 600; cursor: pointer; font-size: 14px; }
+    .btn.secondary { background: #fff; color: #2563eb; border: 1px solid #2563eb; }
+    .client-bar { background: #fff; padding: 12px 16px; border-bottom: 1px solid #e5e7eb; font-size: 13px; color: #6b7280; }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>📄 Orçamento de Serviços</h1>
+    <span class="badge">DEMO</span>
+  </div>
+  <div class="client-bar">Cliente: <strong>Demo Ltda</strong> • Projeto: Site institucional</div>
+  <div class="container">
+    <div class="paper">
+      <div class="paper-header">
+        <div>
+          <h2>Orçamento #DEMO-001</h2>
+          <p>Desenvolvimento de site institucional • Validade: 15 dias</p>
+        </div>
+        <div style="text-align:right; font-size:12px; color:#6b7280;">Data: 16/08/2026</div>
+      </div>
+      <div class="row"><span>Design UI/UX</span><span>R$ 1.200,00</span></div>
+      <div class="row"><span>Frontend React</span><span>R$ 2.400,00</span></div>
+      <div class="row"><span>Backend API</span><span>R$ 2.100,00</span></div>
+      <div class="row"><span>SEO básico</span><span>R$ 600,00</span></div>
+      <div class="row total"><span>Total</span><span>R$ 6.300,00</span></div>
+      <div class="actions">
+        <button class="btn">📥 Baixar PDF</button>
+        <button class="btn secondary">📧 Enviar por email</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
