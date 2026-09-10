@@ -14,6 +14,8 @@ jobs:
   ronda:
     name: "Ronda diária — Sprint 1"
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Gerar relatório
         id: relatorio
@@ -47,7 +49,7 @@ jobs:
             BRANCH=$(echo "$PR_DATA" | jq -r ".[$i].headRefName")
             DRAFT=$(echo "$PR_DATA" | jq -r ".[$i].isDraft")
             CREATED=$(echo "$PR_DATA" | jq -r ".[$i].createdAt")
-            TS=$(date -d "$CREATED" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "$CREATED" +%s 2>/dev/null || echo 0)
+            TS=$(date -d "$CREATED" +%s 2>/dev/null || echo 0)
             AGE_DAYS=$(( (NOW - TS) / 86400 ))
             if [ "$AGE_DAYS" -gt 2 ]; then
               DRAFT_TAG=""; [ "$DRAFT" = "true" ] && DRAFT_TAG=" (draft)"
@@ -105,7 +107,7 @@ jobs:
           PRS_SECTION="${{ steps.relatorio.outputs.PRS_SECTION }}"
           ISS_SECTION="${{ steps.relatorio.outputs.ISS_SECTION }}"
 
-          # Escrever body em arquivo
+          # Escrever body em arquivo (sem indentação no heredoc)
           cat > /tmp/ronda-body.md <<EOF
           # ${TITLE}
 
@@ -162,6 +164,9 @@ jobs:
   stale:
     name: "Detectar PRs/issues stale"
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
     steps:
       - uses: actions/stale@v9
         with:
