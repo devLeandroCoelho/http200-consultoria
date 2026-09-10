@@ -122,14 +122,16 @@ jobs:
             gh issue edit "$EXISTING" --repo "$REPO" --title "$TITLE" --body-file /tmp/ronda-body.md
             echo "✅ Issue #$EXISTING atualizada com ronda de $TODAY"
           else
-            NEW_NUM=$(gh issue create --repo "$REPO" \
+            # gh issue create retorna a URL no stdout
+            ISSUE_URL=$(gh issue create --repo "$REPO" \
               --title "$TITLE" \
               --body-file /tmp/ronda-body.md \
               --label "meta-ronda" \
               --label "stale" \
-              --milestone "Sprint 1" \
-              --json number --jq '.number')
-            echo "✅ Issue #$NEW_NUM criada para ronda de $TODAY"
+              --milestone "Sprint 1")
+            # Extrair número da URL: https://github.com/owner/repo/issues/123
+            NEW_NUM=$(echo "$ISSUE_URL" | grep -oE '[0-9]+$')
+            echo "✅ Issue #$NEW_NUM criada para ronda de $TODAY — $ISSUE_URL"
 
             # Fechar issues de ronda antigas
             gh issue list --repo "$REPO" --search 'Ronda diária in:title label:meta-ronda' --state open --json number --jq '.[].number' | while read OLD_NUM; do
