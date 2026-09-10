@@ -17,14 +17,13 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Gerar relatório
-        id: relatorio
+      - name: Gerar relatório e criar issue
         run: |
           REPO="${{ github.repository }}"
           TODAY=$(date -u +%d/%m/%Y)
           TODAY_ISO=$(date -u +%Y-%m-%d)
 
-          # --- Último push ---
+          # === Último push ===
           PUSHED=$(gh api "repos/$REPO" --jq '.pushed_at')
           PUSH_DATE=$(echo "$PUSHED" | cut -d'T' -f1)
           if [ "$PUSH_DATE" = "$TODAY_ISO" ]; then
@@ -38,105 +37,85 @@ jobs:
             fi
           fi
 
-          # --- PRs parados >48h ---
+          # === PRs parados >48h ===
           NOW=$(date +%s)
           PR_DATA=$(gh pr list --repo "$REPO" --state open --json number,title,createdAt,headRefName,isDraft)
           PR_COUNT=$(echo "$PR_DATA" | jq 'length')
-          PR_LINES=""
-          for i in $(seq 0 $((PR_COUNT - 1))); do
-            NUM=$(echo "$PR_DATA" | jq -r ".[$i].number")
-            TITLE=$(echo "$PR_DATA" | jq -r ".[$i].title")
-            BRANCH=$(echo "$PR_DATA" | jq -r ".[$i].headRefName")
-            DRAFT=$(echo "$PR_DATA" | jq -r ".[$i].isDraft")
-            CREATED=$(echo "$PR_DATA" | jq -r ".[$i].createdAt")
-            TS=$(date -d "$CREATED" +%s 2>/dev/null || echo 0)
-            AGE_DAYS=$(( (NOW - TS) / 86400 ))
-            if [ "$AGE_DAYS" -gt 2 ]; then
-              DRAFT_TAG=""; [ "$DRAFT" = "true" ] && DRAFT_TAG=" (draft)"
-              PR_LINES="${PR_LINES}\n• PR #${NUM}: ${TITLE} (\`${BRANCH}\`)${DRAFT_TAG} — ${AGE_DAYS} dias"
+          HAS_STALE_PRS=false
+          {
+            echo "## PRs parados >48h"
+            echo ""
+            for i in $(seq 0 $((PR_COUNT - 1))); do
+              NUM=$(echo "$PR_DATA" | jq -r ".[$i].number")
+              TITLE=$(echo "$PR_DATA" | jq -r ".[$i].title")
+              BRANCH=$(echo "$PR_DATA" | jq -r ".[$i].headRefName")
+              DRAFT=$(echo "$PR_DATA" | jq -r ".[$i].isDraft")
+              CREATED=$(echo "$PR_DATA" | jq -r ".[$i].createdAt")
+              TS=$(date -d "$CREATED" +%s 2>/dev/null || echo 0)
+              AGE_DAYS=$(( (NOW - TS) / 86400 ))
+              if [ "$AGE_DAYS" -gt 2 ]; then
+                HAS_STALE_PRS=true
+                DRAFT_TAG=""
+                [ "$DRAFT" = "true" ] && DRAFT_TAG=" (draft)"
+                echo "- 🟠 PR #${NUM}: ${TITLE} — ${AGE_DAYS} dias"
+              fi
+            done
+            if [ "$HAS_STALE_PRS" = false ]; then
+              echo "_Nenhum PR parado há mais de 48h 🎉_"
             fi
-          done
-          if [ -z "$PR_LINES" ]; then
-            PRS_SECTION="Nenhum PR parado há mais de 48h 🎉"
-          else
-            PRS_SECTION=$(echo -e "🟠 **PRs parados >48h:**${PR_LINES}")
-          fi
+          } > /tmp/prs-section.md
 
-          # --- Issues Sprint 1 ---
+          # === Issues Sprint 1 ===
           ISS_DATA=$(gh issue list --repo "$REPO" --milestone "Sprint 1" --state open --json number,title,labels)
           ISS_COUNT=$(echo "$ISS_DATA" | jq 'length')
-          ISS_LINES=""
-          for i in $(seq 0 $((ISS_COUNT - 1))); do
-            NUM=$(echo "$ISS_DATA" | jq -r ".[$i].number")
-            TITLE=$(echo "$ISS_DATA" | jq -r ".[$i].title")
-            LABELS=$(echo "$ISS_DATA" | jq -r "[.[$i].labels[].name] | join(\", \")")
-            if [ -n "$LABELS" ] && [ "$LABELS" != "null" ]; then
-              ISS_LINES="${ISS_LINES}\n• Issue #${NUM}: ${TITLE} — _${LABELS}_"
-            else
-              ISS_LINES="${ISS_LINES}\n• Issue #${NUM}: ${TITLE}"
-            fi
-          done
-          if [ -z "$ISS_LINES" ]; then
-            ISS_SECTION="Nenhuma issue aberta no Sprint 1"
-          else
-            ISS_SECTION=$(echo -e "$ISS_LINES")
-          fi
-
-          # --- Montar body ---
           {
-            echo "TITLE=📋 Ronda diária — $TODAY"
-            echo "REPO=$REPO"
-            echo "TODAY=$TODAY"
-            echo "PUSH_STATUS<<EOPUSH"
+            echo "## Issues Sprint 1 abertas"
+            echo ""
+            for i in $(seq 0 $((ISS_COUNT - 1))); do
+              NUM=$(echo "$ISS_DATA" | jq -r ".[$i].number")
+              TITLE=$(echo "$ISS_DATA" | jq -r ".[$i].title")
+              LABELS=$(echo "$ISS_DATA" | jq -r "[.[$i].labels[].name] | join(\", \")")
+              if [ -n "$LABELS" ] && [ "$LABELS" != "null" ]; then
+                echo "- Issue #${NUM}: ${TITLE} — _${LABELS}_"
+              else
+                echo "- Issue #${NUM}: ${TITLE}"
+              fi
+            done
+            if [ "$ISS_COUNT" -eq 0 ]; then
+              echo "_Nenhuma issue aberta no Sprint 1_"
+            fi
+          } > /tmp/issues-section.md
+
+          # === Montar body do relatório ===
+          {
+            echo "# 📋 Ronda diária — $TODAY"
+            echo ""
+            echo "**Repo:** \`$REPO\`"
+            echo ""
+            echo "---"
+            echo ""
+            echo "## Último push"
+            echo ""
             echo "$PUSH_STATUS"
-            echo "EOPUSH"
-            echo "PRS_SECTION<<EOPRS"
-            echo "$PRS_SECTION"
-            echo "EOPRS"
-            echo "ISS_SECTION<<EOISS"
-            echo "$ISS_SECTION"
-            echo "EOISS"
-          } >> "$GITHUB_OUTPUT"
+            echo ""
+            echo "---"
+            echo ""
+            cat /tmp/prs-section.md
+            echo ""
+            echo "---"
+            echo ""
+            cat /tmp/issues-section.md
+            echo ""
+            echo "---"
+            echo ""
+            echo "_Relatório gerado automaticamente pela workflow ronda-diaria.yml._"
+          } > /tmp/ronda-body.md
 
-      - name: Criar ou atualizar issue de ronda
-        run: |
-          REPO="${{ steps.relatorio.outputs.REPO }}"
-          TODAY="${{ steps.relatorio.outputs.TODAY }}"
-          TITLE="${{ steps.relatorio.outputs.TITLE }}"
-          PUSH_STATUS="${{ steps.relatorio.outputs.PUSH_STATUS }}"
-          PRS_SECTION="${{ steps.relatorio.outputs.PRS_SECTION }}"
-          ISS_SECTION="${{ steps.relatorio.outputs.ISS_SECTION }}"
+          echo "=== Body gerado ==="
+          cat /tmp/ronda-body.md
 
-          # Escrever body em arquivo (sem indentação no heredoc)
-          cat > /tmp/ronda-body.md <<EOF
-          # ${TITLE}
-
-          **Repo:** \`${REPO}\`
-
-          ---
-
-          ## Último push
-
-          ${PUSH_STATUS}
-
-          ---
-
-          ## PRs parados >48h
-
-          ${PRS_SECTION}
-
-          ---
-
-          ## Issues Sprint 1 abertas
-
-          ${ISS_SECTION}
-
-          ---
-
-          _Relatório gerado automaticamente pela workflow \`ronda-diaria.yml\`._
-          EOF
-
-          # Buscar issue de ronda existente
+          # === Criar ou atualizar issue ===
+          TITLE="📋 Ronda diária — $TODAY"
           EXISTING=$(gh issue list --repo "$REPO" --search 'Ronda diária in:title label:meta-ronda' --state open --json number --jq '.[0].number // empty')
 
           if [ -n "$EXISTING" ]; then
